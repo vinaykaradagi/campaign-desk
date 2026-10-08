@@ -19,7 +19,7 @@
   --fg:#1d1a24; --muted:#625c70; --accent:#5a3ea6; --accent-fg:#ffffff; --accent-soft:#e9e2f8;
   --ok:#1f7a4d; --ok-soft:#dcf1e5; --bad:#b3261e; --bad-soft:#fadcd9; --warn:#9a5b00; --warn-soft:#fbecd2;
   /* opinion (diverging: my side ↔ opposite, gray midpoint) */
-  --my:#5a3ea6; --neu:#8e8a99; --opp:#c4561d; --unk:#e3dfeb;
+  --my:#1f8a4c; --neu:#e08a00; --opp:#d0342c; --unk:#e3dfeb; --on-my:#ffffff; --on-neu:#2a1800; --on-opp:#ffffff;
   --display:"Baloo Tamma 2","Noto Sans Kannada","Noto Sans",system-ui,sans-serif;
   --body:"Noto Sans","Noto Sans Kannada",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -29,7 +29,7 @@
   --bg:#141219; --surface:#1d1a25; --sunk:#25212f; --line:#363044;
   --fg:#efebf6; --muted:#a69fb6; --accent:#a98cf2; --accent-fg:#160f28; --accent-soft:#2e2545;
   --ok:#6fd39c; --ok-soft:#173326; --bad:#ff8a80; --bad-soft:#3d1a18; --warn:#f0b75c; --warn-soft:#3a2b12;
-  --my:#9a7ce8; --neu:#6b6878; --opp:#d6733a; --unk:#2f2a3b; color-scheme:dark}}
+  --my:#2fa463; --neu:#b8860b; --opp:#e04558; --unk:#2f2a3b; --on-my:#06140c; --on-neu:#1a1100; --on-opp:#1a0508; color-scheme:dark}}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg)}
 body{color:var(--fg);font:15px/1.5 var(--body);padding-inline:16px;padding-block:env(safe-area-inset-top,0px) calc(84px + env(safe-area-inset-bottom,0px))}
@@ -137,9 +137,9 @@ textarea{min-height:70px;resize:vertical}
 .opseg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex:none}
 .opseg button{border:0;background:var(--surface);padding:6px 9px;font-size:.8rem;cursor:pointer;color:var(--muted);border-left:1px solid var(--line);white-space:nowrap}
 .opseg button:first-child{border-left:0}
-.opseg button[aria-pressed="true"][data-op="my_side"]{background:var(--my);color:var(--surface);font-weight:600}
-.opseg button[aria-pressed="true"][data-op="neutral"]{background:var(--neu);color:var(--surface);font-weight:600}
-.opseg button[aria-pressed="true"][data-op="opposite"]{background:var(--opp);color:var(--surface);font-weight:600}
+.opseg button[aria-pressed="true"][data-op="my_side"]{background:var(--my);color:var(--on-my);font-weight:600}
+.opseg button[aria-pressed="true"][data-op="neutral"]{background:var(--neu);color:var(--on-neu);font-weight:600}
+.opseg button[aria-pressed="true"][data-op="opposite"]{background:var(--opp);color:var(--on-opp);font-weight:600}
 .opseg.big{width:100%}
 .opseg.big button{flex:1;padding:10px 4px;font-size:.92rem}
 
@@ -206,7 +206,7 @@ en:{app:"Campaign Desk",
  loginTitle:"Sign in",loginId:"Login ID",password:"Password",signIn:"Sign in",badLogin:"Wrong login ID or password.",inactive:"This login has been switched off. Contact your ward leader or the MLA.",
  signOut:"Sign out",changePw:"Change my password",newPw:"New password",pwChanged:"Password changed",account:"Your account",
  mla:"MLA",ward_leader:"Ward leader",worker:"Party worker",ward:"Ward",allWards:"All wards",constituency:"Constituency",
- my_side:"My side",neutral:"Neutral",opposite:"Opposite",unknown:"Not asked",total:"Voters recorded",
+ my_side:"Supporter",neutral:"Neutral",opposite:"Opponent",unknown:"Not asked",total:"Voters recorded",
  byWard:"Ward-wise opinion",tapWard:"Tap a ward to see its details.",topIssues:"Top issues raised",noIssues:"No issues recorded yet.",
  teamWork:"Team activity",added:"added",updated:"updated",back:"Back to all wards",
  search:"Search name, house no., voter ID or phone",addVoter:"Add voter",editVoter:"Edit voter",fullName:"Full name",houseNo:"House / door no.",age:"Age",gender:"Gender",
@@ -237,7 +237,7 @@ kn:{app:"ಪ್ರಚಾರ ಕೇಂದ್ರ",
  loginTitle:"ಲಾಗಿನ್",loginId:"ಲಾಗಿನ್ ಐಡಿ",password:"ಪಾಸ್‌ವರ್ಡ್",signIn:"ಲಾಗಿನ್ ಮಾಡಿ",badLogin:"ಲಾಗಿನ್ ಐಡಿ ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್ ತಪ್ಪಾಗಿದೆ.",inactive:"ಈ ಲಾಗಿನ್ ನಿಲ್ಲಿಸಲಾಗಿದೆ. ನಿಮ್ಮ ವಾರ್ಡ್ ಮುಖಂಡರು ಅಥವಾ ಶಾಸಕರನ್ನು ಸಂಪರ್ಕಿಸಿ.",
  signOut:"ಲಾಗ್ ಔಟ್",changePw:"ನನ್ನ ಪಾಸ್‌ವರ್ಡ್ ಬದಲಿಸಿ",newPw:"ಹೊಸ ಪಾಸ್‌ವರ್ಡ್",pwChanged:"ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿತು",account:"ನಿಮ್ಮ ಖಾತೆ",
  mla:"ಶಾಸಕರು",ward_leader:"ವಾರ್ಡ್ ಮುಖಂಡ",worker:"ಕಾರ್ಯಕರ್ತ",ward:"ವಾರ್ಡ್",allWards:"ಎಲ್ಲಾ ವಾರ್ಡ್‌ಗಳು",constituency:"ಕ್ಷೇತ್ರ",
- my_side:"ನಮ್ಮ ಪರ",neutral:"ತಟಸ್ಥ",opposite:"ವಿರೋಧ",unknown:"ಕೇಳಿಲ್ಲ",total:"ದಾಖಲಾದ ಮತದಾರರು",
+ my_side:"ಬೆಂಬಲಿಗ",neutral:"ತಟಸ್ಥ",opposite:"ವಿರೋಧಿ",unknown:"ಕೇಳಿಲ್ಲ",total:"ದಾಖಲಾದ ಮತದಾರರು",
  byWard:"ವಾರ್ಡ್‌ವಾರು ಅಭಿಪ್ರಾಯ",tapWard:"ವಿವರ ನೋಡಲು ವಾರ್ಡ್ ಮೇಲೆ ಒತ್ತಿ.",topIssues:"ಪ್ರಮುಖ ಸಮಸ್ಯೆಗಳು",noIssues:"ಇನ್ನೂ ಸಮಸ್ಯೆಗಳು ದಾಖಲಾಗಿಲ್ಲ.",
  teamWork:"ತಂಡದ ಕೆಲಸ",added:"ಸೇರಿಸಿದ್ದು",updated:"ನವೀಕರಿಸಿದ್ದು",back:"ಎಲ್ಲಾ ವಾರ್ಡ್‌ಗಳಿಗೆ ಹಿಂತಿರುಗಿ",
  search:"ಹೆಸರು, ಮನೆ ಸಂಖ್ಯೆ, ಮತದಾರ ಐಡಿ ಅಥವಾ ಫೋನ್ ಹುಡುಕಿ",addVoter:"ಮತದಾರರನ್ನು ಸೇರಿಸಿ",editVoter:"ಮತದಾರರ ವಿವರ ತಿದ್ದಿ",fullName:"ಪೂರ್ಣ ಹೆಸರು",houseNo:"ಮನೆ ಸಂಖ್ಯೆ",age:"ವಯಸ್ಸು",gender:"ಲಿಂಗ",
