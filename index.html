@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="kn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#5a3ea6">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Saundatti Campaign Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Tamma+2:wght@500;700&family=Noto+Sans:wght@400;500;600&family=Noto+Sans+Kannada:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one-column field app — header, scrolling sheet, fixed bottom tab bar; modal sheets slide from bottom on phones. */
+:root{
+  --bg:#f5f3f8; --surface:#ffffff; --sunk:#ece8f2; --line:#dcd6e6;
+  --fg:#1d1a24; --muted:#625c70; --accent:#5a3ea6; --accent-fg:#ffffff; --accent-soft:#e9e2f8;
+  --ok:#1f7a4d; --ok-soft:#dcf1e5; --bad:#b3261e; --bad-soft:#fadcd9; --warn:#9a5b00; --warn-soft:#fbecd2;
+  /* opinion (diverging: my side ↔ opposite, gray midpoint) */
+  --my:#5a3ea6; --neu:#8e8a99; --opp:#c4561d; --unk:#e3dfeb;
+  --display:"Baloo Tamma 2","Noto Sans Kannada","Noto Sans",system-ui,sans-serif;
+  --body:"Noto Sans","Noto Sans Kannada",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:10px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#141219; --surface:#1d1a25; --sunk:#25212f; --line:#363044;
+  --fg:#efebf6; --muted:#a69fb6; --accent:#a98cf2; --accent-fg:#160f28; --accent-soft:#2e2545;
+  --ok:#6fd39c; --ok-soft:#173326; --bad:#ff8a80; --bad-soft:#3d1a18; --warn:#f0b75c; --warn-soft:#3a2b12;
+  --my:#9a7ce8; --neu:#6b6878; --opp:#d6733a; --unk:#2f2a3b; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg)}
+body{color:var(--fg);font:15px/1.5 var(--body);padding-inline:16px;padding-block:env(safe-area-inset-top,0px) calc(84px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:820px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.2;text-wrap:balance;margin:0}
+h2{font-size:1.45rem} h3{font-size:1.08rem}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+
+header.top{display:flex;align-items:center;gap:10px;padding-block:12px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.mark{width:30px;height:30px;border-radius:50% 50% 50% 8px;background:var(--accent);flex:none;position:relative}
+.mark::after{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--bg)}
+.brand h1{font-size:1.12rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand small{display:block;color:var(--muted);font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.langs{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;flex:none}
+.langs button{border:0;background:none;padding:5px 10px;cursor:pointer;font-size:.82rem;color:var(--muted)}
+.langs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
+.acct{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;flex:none;font-size:.85rem}
+
+main{display:flex;flex-direction:column;gap:16px;padding-block:18px}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sub{color:var(--muted);font-size:.9rem;margin:2px 0 0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.row>*{flex:1 1 150px;min-width:0}
+.row>.fit{flex:none}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:.82rem;color:var(--muted);font-weight:500}
+input[type=text],input[type=password],input[type=number],input[type=search],input[type=tel],select,textarea{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:16px;color:var(--fg)}
+textarea{min-height:70px;resize:vertical}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 14px;cursor:pointer;font-weight:500;white-space:nowrap;text-decoration:none;color:var(--fg)}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.btn.big{padding:12px 18px;font-size:1rem;width:100%}
+.btn.ghost{background:none;border-color:transparent;color:var(--muted)}
+.btn.danger{color:var(--bad)}
+.btn.danger.armed{background:var(--bad);color:var(--surface);border-color:var(--bad)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.sm{padding:5px 10px;font-size:.85rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 13px;cursor:pointer;font-size:.9rem;line-height:1.3}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);font-weight:600}
+.chip .n{font-family:var(--mono);font-size:.75rem;color:var(--muted);margin-left:4px}
+.code{font-family:var(--mono);font-size:.78rem;background:var(--sunk);border-radius:6px;padding:2px 7px;color:var(--muted)}
+.note{font-size:.86rem;color:var(--muted);background:var(--sunk);border-radius:8px;padding:10px 12px}
+.note.warn{background:var(--warn-soft);color:var(--warn)}
+.note.bad{background:var(--bad-soft);color:var(--bad)}
+.empty{text-align:center;padding:24px 12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:8px}
+.empty h3{color:var(--fg)}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;min-width:0;display:flex;flex-direction:column;gap:2px}
+.tile b{font-family:var(--display);font-size:1.65rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.tile span{color:var(--muted);font-size:.8rem;display:flex;align-items:center;gap:6px}
+.tile small{color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums}
+@media (max-width:560px){.tiles{grid-template-columns:1fr 1fr}}
+.dot{width:10px;height:10px;border-radius:3px;flex:none;display:inline-block}
+.dot.my{background:var(--my)} .dot.neutral{background:var(--neu)} .dot.opp{background:var(--opp)} .dot.unk{background:var(--unk);box-shadow:inset 0 0 0 1px var(--line)}
+
+/* donut + legend */
+.donut-wrap{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.donut{width:170px;height:170px;flex:none;max-width:100%}
+.donut text{fill:var(--fg);font-family:var(--display)}
+.donut .lbl{fill:var(--muted);font-family:var(--body);font-size:9px}
+.legend{display:flex;flex-direction:column;gap:8px;flex:1 1 200px;min-width:0;margin:0;padding:0;list-style:none}
+.legend li{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;font-size:.92rem}
+.legend .v{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.86rem}
+.legend .v b{color:var(--fg);font-weight:600}
+
+/* stacked ward bars */
+.wards{display:flex;flex-direction:column;margin:0;padding:0;list-style:none}
+.wardrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding-block:11px;border-top:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;width:100%;color:inherit}
+.wards li:first-child .wardrow{border-top:0}
+.wardrow:hover .wname{color:var(--accent)}
+.wname{font-weight:600;overflow-wrap:anywhere}
+.wtot{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.85rem;text-align:right}
+.stack{grid-column:1/-1;display:flex;gap:2px;height:12px}
+.stack i{display:block;height:100%;min-width:0}
+.stack i:first-child{border-radius:4px 0 0 4px} .stack i:last-child{border-radius:0 4px 4px 0} .stack i:only-child{border-radius:4px}
+.stack .my{background:var(--my)} .stack .neutral{background:var(--neu)} .stack .opp{background:var(--opp)} .stack .unk{background:var(--unk)}
+.stack.empty-bar{background:var(--sunk);border-radius:4px}
+.wpct{grid-column:1/-1;display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.wpct span{display:inline-flex;align-items:center;gap:5px}
+
+/* single-hue bars */
+.bars{display:flex;flex-direction:column;gap:9px}
+.bar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 10px;font-size:.9rem}
+.bar .val{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.85rem;text-align:right}
+.bar .track{grid-column:1/-1;height:8px;background:var(--sunk);border-radius:4px;overflow:hidden}
+.bar .fill{height:100%;background:var(--accent);border-radius:4px}
+
+/* voters */
+.vlist{display:flex;flex-direction:column;margin:0;padding:0;list-style:none}
+.voter{display:flex;gap:10px;align-items:center;padding-block:10px;border-top:1px solid var(--line);flex-wrap:wrap}
+.voter:first-child{border-top:0}
+.v-main{flex:1 1 180px;min-width:0;background:none;border:0;padding:0;text-align:left;cursor:pointer;color:inherit}
+.v-name{font-weight:600;display:block;overflow-wrap:anywhere}
+.v-main:hover .v-name{color:var(--accent)}
+.v-meta{color:var(--muted);font-size:.82rem;display:block;overflow-wrap:anywhere}
+.opseg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex:none}
+.opseg button{border:0;background:var(--surface);padding:6px 9px;font-size:.8rem;cursor:pointer;color:var(--muted);border-left:1px solid var(--line);white-space:nowrap}
+.opseg button:first-child{border-left:0}
+.opseg button[aria-pressed="true"][data-op="my_side"]{background:var(--my);color:var(--surface);font-weight:600}
+.opseg button[aria-pressed="true"][data-op="neutral"]{background:var(--neu);color:var(--surface);font-weight:600}
+.opseg button[aria-pressed="true"][data-op="opposite"]{background:var(--opp);color:var(--surface);font-weight:600}
+.opseg.big{width:100%}
+.opseg.big button{flex:1;padding:10px 4px;font-size:.92rem}
+
+/* team */
+details.ward{border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+details.ward>summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+details.ward>summary::-webkit-details-marker{display:none}
+details.ward>summary::before{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .15s;flex:none}
+details.ward[open]>summary::before{transform:rotate(45deg)}
+details.ward .body{padding:0 16px 16px;display:flex;flex-direction:column;gap:12px}
+.mlist{display:flex;flex-direction:column;margin:0;padding:0;list-style:none}
+.member{display:flex;gap:10px;align-items:center;padding-block:10px;border-top:1px solid var(--line);flex-wrap:wrap}
+.member:first-child{border-top:0}
+.member .grow{flex:1 1 180px;min-width:0}
+.member .t{font-weight:600;overflow-wrap:anywhere}
+.member .m{color:var(--muted);font-size:.82rem;overflow-wrap:anywhere}
+.role{display:inline-block;border-radius:999px;padding:2px 9px;font-size:.74rem;font-weight:600;background:var(--sunk);color:var(--muted);vertical-align:middle;margin-left:4px}
+.role.ward_leader{background:var(--accent-soft);color:var(--accent)}
+.role.mla{background:var(--accent);color:var(--accent-fg)}
+.acts{display:flex;gap:4px;flex-wrap:wrap}
+
+/* sheet */
+.sheet-bg{position:fixed;inset:0;background:rgb(10 8 16 / .45);z-index:20;display:flex;align-items:center;justify-content:center;padding:16px}
+.sheet{background:var(--surface);border-radius:14px;width:100%;max-width:560px;max-height:calc(100% - 16px);overflow:auto;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 50px rgb(0 0 0 / .25)}
+@media (max-width:560px){.sheet-bg{align-items:flex-end;padding:0}.sheet{border-radius:14px 14px 0 0;max-height:92%;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.cred{font-family:var(--mono);background:var(--sunk);border-radius:8px;padding:12px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.92rem}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav.tabs .in{max-width:820px;margin:0 auto;display:flex}
+nav.tabs button{flex:1;border:0;background:none;padding:9px 2px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:.74rem;min-width:0}
+nav.tabs button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs button[aria-current="page"]{color:var(--accent);font-weight:600}
+.toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:.9rem;z-index:30;max-width:calc(100% - 32px)}
+
+/* login */
+.login{max-width:380px;margin:8vh auto 0;display:flex;flex-direction:column;gap:18px}
+.login .mark{width:44px;height:44px}
+.login .mark::after{inset:13px}
+.spin{width:22px;height:22px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:3s}details.ward>summary::before{transition:none}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><div class="empty" style="margin-top:20vh"><div class="spin"></div></div></div>
+<nav class="tabs" id="tabbar" hidden aria-label="Sections"><div class="in" id="tabs"></div></nav>
+<div class="sheet-bg" id="sheetbg" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+"use strict";
+/* ================= strings ================= */
+const T={
+en:{app:"Campaign Desk",dashboard:"Dashboard",voters:"Voters",team:"Team",
+ loginTitle:"Sign in",loginId:"Login ID",password:"Password",signIn:"Sign in",badLogin:"Wrong login ID or password.",inactive:"This login has been switched off. Contact your ward leader or the MLA.",
+ signOut:"Sign out",changePw:"Change my password",newPw:"New password",pwChanged:"Password changed",account:"Your account",
+ mla:"MLA",ward_leader:"Ward leader",worker:"Party worker",ward:"Ward",allWards:"All wards",constituency:"Constituency",
+ my_side:"My side",neutral:"Neutral",opposite:"Opposite",unknown:"Not asked",total:"Voters recorded",
+ byWard:"Ward-wise opinion",tapWard:"Tap a ward to see its details.",topIssues:"Top issues raised",noIssues:"No issues recorded yet.",
+ teamWork:"Team activity",added:"added",updated:"updated",back:"Back to all wards",
+ search:"Search name, house no., voter ID or phone",addVoter:"Add voter",editVoter:"Edit voter",fullName:"Full name",houseNo:"House / door no.",age:"Age",gender:"Gender",
+ male:"Male",female:"Female",other:"Other",phone:"Phone",epic:"Voter ID (EPIC)",opinion:"Opinion",issues:"Issues they raised",notes:"Notes",
+ consent:"Voter agreed to share phone number",consentNote:"Write down a phone number only if the voter agrees.",save:"Save",cancel:"Cancel",del:"Delete",confirm:"Tap again to confirm",
+ saved:"Saved",deleted:"Deleted",showMore:"Show more",noVoters:"No voters match.",noVotersYet:"No voters added in this ward yet",noVotersYetB:"Add voters one by one, or import the electoral roll as a CSV file.",
+ sortName:"Name",sortHouse:"House no.",sortRecent:"Recently updated",sort:"Sort",of:"of",shown:"shown",
+ exportCsv:"Export CSV",importCsv:"Import CSV",importTitle:"Import voters from CSV",importHelp:"Columns can be: name, house_no, age, gender, phone, epic_no, opinion. The first row must be the column names. Voters whose voter ID is already in the list are skipped.",
+ chooseFile:"Choose CSV file",importInto:"Import into ward",rowsFound:"rows found",doImport:"Import",importing:"Importing…",imported:"Imported",skipped:"skipped as duplicates",noNameCol:"Couldn't find a name column. Add a header row with 'name'.",
+ lastBy:"Last updated by",
+ wards:"Wards",addWard:"Add ward",editWard:"Edit ward",wardNo:"Ward number",wardName:"Ward name",delWard:"Delete ward",
+ addLeader:"Add ward leader",addWorker:"Add worker",editMember:"Edit member",resetPw:"Reset password",remove:"Remove",restore:"Restore",
+ removed:"Removed logins",leaders:"Ward leaders",workers:"Party workers",noLeader:"No ward leader yet",noWorkers:"No workers yet",
+ generate:"Generate",created:"Login created",shareCreds:"Share these details with",copy:"Copy",copied:"Copied",done:"Done",appLink:"App link",
+ setup:"Survey issues list",setupHelp:"These appear as tap-chips on every voter form.",issueEn:"Issue (English)",issueKn:"Issue (ಕನ್ನಡ)",addIssue:"Add issue",
+ votersN:"voters",
+ E_LOGIN_TAKEN:"That login ID is already used. Pick another.",E_LOGIN_FORMAT:"Login ID: 3–30 small letters, digits, dot, dash or underscore. No spaces.",E_PASSWORD_SHORT:"Password must be at least 6 characters.",
+ E_NOT_ALLOWED:"You don't have permission for this.",E_WARD_REQUIRED:"Choose a ward.",E_NAME_REQUIRED:"Enter the name.",E_EPIC:"A voter with this voter ID is already in the list.",
+ E_WARD_IN_USE:"This ward still has people or voters. Move or remove them first.",E_NET:"No connection. Check your internet and try again.",E_GENERIC:"Something went wrong. Try again.",
+ notConfigured:"App not set up yet",notConfiguredB:"Open config.js and paste your Supabase project URL and key, then reload this page.",
+ privacy:"Voter details are private campaign data. Do not share screenshots outside the team."},
+kn:{app:"ಪ್ರಚಾರ ಕೇಂದ್ರ",dashboard:"ಸಾರಾಂಶ",voters:"ಮತದಾರರು",team:"ತಂಡ",
+ loginTitle:"ಲಾಗಿನ್",loginId:"ಲಾಗಿನ್ ಐಡಿ",password:"ಪಾಸ್‌ವರ್ಡ್",signIn:"ಲಾಗಿನ್ ಮಾಡಿ",badLogin:"ಲಾಗಿನ್ ಐಡಿ ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್ ತಪ್ಪಾಗಿದೆ.",inactive:"ಈ ಲಾಗಿನ್ ನಿಲ್ಲಿಸಲಾಗಿದೆ. ನಿಮ್ಮ ವಾರ್ಡ್ ಮುಖಂಡರು ಅಥವಾ ಶಾಸಕರನ್ನು ಸಂಪರ್ಕಿಸಿ.",
+ signOut:"ಲಾಗ್ ಔಟ್",changePw:"ನನ್ನ ಪಾಸ್‌ವರ್ಡ್ ಬದಲಿಸಿ",newPw:"ಹೊಸ ಪಾಸ್‌ವರ್ಡ್",pwChanged:"ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿತು",account:"ನಿಮ್ಮ ಖಾತೆ",
+ mla:"ಶಾಸಕರು",ward_leader:"ವಾರ್ಡ್ ಮುಖಂಡ",worker:"ಕಾರ್ಯಕರ್ತ",ward:"ವಾರ್ಡ್",allWards:"ಎಲ್ಲಾ ವಾರ್ಡ್‌ಗಳು",constituency:"ಕ್ಷೇತ್ರ",
+ my_side:"ನಮ್ಮ ಪರ",neutral:"ತಟಸ್ಥ",opposite:"ವಿರೋಧ",unknown:"ಕೇಳಿಲ್ಲ",total:"ದಾಖಲಾದ ಮತದಾರರು",
+ byWard:"ವಾರ್ಡ್‌ವಾರು ಅಭಿಪ್ರಾಯ",tapWard:"ವಿವರ ನೋಡಲು ವಾರ್ಡ್ ಮೇಲೆ ಒತ್ತಿ.",topIssues:"ಪ್ರಮುಖ ಸಮಸ್ಯೆಗಳು",noIssues:"ಇನ್ನೂ ಸಮಸ್ಯೆಗಳು ದಾಖಲಾಗಿಲ್ಲ.",
+ teamWork:"ತಂಡದ ಕೆಲಸ",added:"ಸೇರಿಸಿದ್ದು",updated:"ನವೀಕರಿಸಿದ್ದು",back:"ಎಲ್ಲಾ ವಾರ್ಡ್‌ಗಳಿಗೆ ಹಿಂತಿರುಗಿ",
+ search:"ಹೆಸರು, ಮನೆ ಸಂಖ್ಯೆ, ಮತದಾರ ಐಡಿ ಅಥವಾ ಫೋನ್ ಹುಡುಕಿ",addVoter:"ಮತದಾರರನ್ನು ಸೇರಿಸಿ",editVoter:"ಮತದಾರರ ವಿವರ ತಿದ್ದಿ",fullName:"ಪೂರ್ಣ ಹೆಸರು",houseNo:"ಮನೆ ಸಂಖ್ಯೆ",age:"ವಯಸ್ಸು",gender:"ಲಿಂಗ",
+ male:"ಪುರುಷ",female:"ಮಹಿಳೆ",other:"ಇತರೆ",phone:"ಫೋನ್",epic:"ಮತದಾರರ ಗುರುತಿನ ಚೀಟಿ (EPIC)",opinion:"ಅಭಿಪ್ರಾಯ",issues:"ಅವರು ಹೇಳಿದ ಸಮಸ್ಯೆಗಳು",notes:"ಟಿಪ್ಪಣಿ",
+ consent:"ಫೋನ್ ಸಂಖ್ಯೆ ನೀಡಲು ಮತದಾರರು ಒಪ್ಪಿದ್ದಾರೆ",consentNote:"ಮತದಾರರು ಒಪ್ಪಿದರೆ ಮಾತ್ರ ಫೋನ್ ಸಂಖ್ಯೆ ಬರೆಯಿರಿ.",save:"ಉಳಿಸಿ",cancel:"ರದ್ದು",del:"ಅಳಿಸಿ",confirm:"ಖಚಿತಪಡಿಸಲು ಮತ್ತೆ ಒತ್ತಿ",
+ saved:"ಉಳಿಸಲಾಗಿದೆ",deleted:"ಅಳಿಸಲಾಗಿದೆ",showMore:"ಇನ್ನಷ್ಟು ತೋರಿಸಿ",noVoters:"ಯಾವುದೇ ಮತದಾರರು ಸಿಗಲಿಲ್ಲ.",noVotersYet:"ಈ ವಾರ್ಡ್‌ನಲ್ಲಿ ಇನ್ನೂ ಮತದಾರರನ್ನು ಸೇರಿಸಿಲ್ಲ",noVotersYetB:"ಒಬ್ಬೊಬ್ಬರನ್ನಾಗಿ ಸೇರಿಸಿ, ಅಥವಾ ಮತದಾರರ ಪಟ್ಟಿಯನ್ನು CSV ಫೈಲ್ ಆಗಿ ಆಮದು ಮಾಡಿ.",
+ sortName:"ಹೆಸರು",sortHouse:"ಮನೆ ಸಂಖ್ಯೆ",sortRecent:"ಇತ್ತೀಚೆಗೆ ನವೀಕರಿಸಿದ್ದು",sort:"ಕ್ರಮ",of:"/",shown:"ತೋರಿಸಲಾಗಿದೆ",
+ exportCsv:"CSV ರಫ್ತು",importCsv:"CSV ಆಮದು",importTitle:"CSV ಯಿಂದ ಮತದಾರರನ್ನು ಆಮದು ಮಾಡಿ",importHelp:"ಕಾಲಮ್‌ಗಳು: name, house_no, age, gender, phone, epic_no, opinion. ಮೊದಲ ಸಾಲು ಕಾಲಮ್ ಹೆಸರುಗಳಾಗಿರಬೇಕು. ಈಗಾಗಲೇ ಇರುವ ಮತದಾರ ಐಡಿಗಳನ್ನು ಬಿಡಲಾಗುತ್ತದೆ.",
+ chooseFile:"CSV ಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ",importInto:"ಯಾವ ವಾರ್ಡ್‌ಗೆ",rowsFound:"ಸಾಲುಗಳು ಸಿಕ್ಕಿವೆ",doImport:"ಆಮದು ಮಾಡಿ",importing:"ಆಮದು ಆಗುತ್ತಿದೆ…",imported:"ಆಮದು ಆಯಿತು",skipped:"ನಕಲು ಎಂದು ಬಿಡಲಾಗಿದೆ",noNameCol:"ಹೆಸರಿನ ಕಾಲಮ್ ಸಿಗಲಿಲ್ಲ. 'name' ಎಂಬ ಶೀರ್ಷಿಕೆ ಸಾಲು ಸೇರಿಸಿ.",
+ lastBy:"ಕೊನೆಯದಾಗಿ ನವೀಕರಿಸಿದವರು",
+ wards:"ವಾರ್ಡ್‌ಗಳು",addWard:"ವಾರ್ಡ್ ಸೇರಿಸಿ",editWard:"ವಾರ್ಡ್ ತಿದ್ದಿ",wardNo:"ವಾರ್ಡ್ ಸಂಖ್ಯೆ",wardName:"ವಾರ್ಡ್ ಹೆಸರು",delWard:"ವಾರ್ಡ್ ಅಳಿಸಿ",
+ addLeader:"ವಾರ್ಡ್ ಮುಖಂಡರನ್ನು ಸೇರಿಸಿ",addWorker:"ಕಾರ್ಯಕರ್ತರನ್ನು ಸೇರಿಸಿ",editMember:"ಸದಸ್ಯರ ವಿವರ ತಿದ್ದಿ",resetPw:"ಪಾಸ್‌ವರ್ಡ್ ಮರುಹೊಂದಿಸಿ",remove:"ತೆಗೆದುಹಾಕಿ",restore:"ಮರಳಿ ಸೇರಿಸಿ",
+ removed:"ತೆಗೆದುಹಾಕಿದ ಲಾಗಿನ್‌ಗಳು",leaders:"ವಾರ್ಡ್ ಮುಖಂಡರು",workers:"ಕಾರ್ಯಕರ್ತರು",noLeader:"ಇನ್ನೂ ವಾರ್ಡ್ ಮುಖಂಡರಿಲ್ಲ",noWorkers:"ಇನ್ನೂ ಕಾರ್ಯಕರ್ತರಿಲ್ಲ",
+ generate:"ರಚಿಸಿ",created:"ಲಾಗಿನ್ ರಚಿಸಲಾಗಿದೆ",shareCreds:"ಈ ವಿವರಗಳನ್ನು ಇವರಿಗೆ ಕೊಡಿ:",copy:"ನಕಲಿಸಿ",copied:"ನಕಲಿಸಲಾಗಿದೆ",done:"ಮುಗಿಯಿತು",appLink:"ಆ್ಯಪ್ ಲಿಂಕ್",
+ setup:"ಸಮಸ್ಯೆಗಳ ಪಟ್ಟಿ",setupHelp:"ಇವು ಪ್ರತಿ ಮತದಾರರ ಫಾರ್ಮ್‌ನಲ್ಲಿ ಆಯ್ಕೆಗಳಾಗಿ ಕಾಣುತ್ತವೆ.",issueEn:"ಸಮಸ್ಯೆ (English)",issueKn:"ಸಮಸ್ಯೆ (ಕನ್ನಡ)",addIssue:"ಸಮಸ್ಯೆ ಸೇರಿಸಿ",
+ votersN:"ಮತದಾರರು",
+ E_LOGIN_TAKEN:"ಈ ಲಾಗಿನ್ ಐಡಿ ಈಗಾಗಲೇ ಬಳಕೆಯಲ್ಲಿದೆ. ಬೇರೆ ಆಯ್ಕೆಮಾಡಿ.",E_LOGIN_FORMAT:"ಲಾಗಿನ್ ಐಡಿ: 3–30 ಇಂಗ್ಲಿಷ್ ಸಣ್ಣ ಅಕ್ಷರ, ಅಂಕೆ, . - _ ಮಾತ್ರ. ಖಾಲಿ ಜಾಗ ಬೇಡ.",E_PASSWORD_SHORT:"ಪಾಸ್‌ವರ್ಡ್ ಕನಿಷ್ಠ 6 ಅಕ್ಷರಗಳಿರಬೇಕು.",
+ E_NOT_ALLOWED:"ಇದಕ್ಕೆ ನಿಮಗೆ ಅನುಮತಿ ಇಲ್ಲ.",E_WARD_REQUIRED:"ವಾರ್ಡ್ ಆಯ್ಕೆಮಾಡಿ.",E_NAME_REQUIRED:"ಹೆಸರು ಬರೆಯಿರಿ.",E_EPIC:"ಈ ಮತದಾರ ಐಡಿ ಈಗಾಗಲೇ ಪಟ್ಟಿಯಲ್ಲಿದೆ.",
+ E_WARD_IN_USE:"ಈ ವಾರ್ಡ್‌ನಲ್ಲಿ ಇನ್ನೂ ಸದಸ್ಯರು ಅಥವಾ ಮತದಾರರು ಇದ್ದಾರೆ. ಮೊದಲು ಅವರನ್ನು ಸ್ಥಳಾಂತರಿಸಿ ಅಥವಾ ತೆಗೆದುಹಾಕಿ.",E_NET:"ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಇಲ್ಲ. ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",E_GENERIC:"ಏನೋ ತಪ್ಪಾಯಿತು. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+ notConfigured:"ಆ್ಯಪ್ ಇನ್ನೂ ಸಿದ್ಧವಾಗಿಲ್ಲ",notConfiguredB:"config.js ತೆರೆದು Supabase URL ಮತ್ತು key ಅಂಟಿಸಿ, ನಂತರ ಪುಟವನ್ನು ರೀಲೋಡ್ ಮಾಡಿ.",
+ privacy:"ಮತದಾರರ ವಿವರಗಳು ಗೌಪ್ಯ ಪ್ರಚಾರ ಮಾಹಿತಿ. ತಂಡದ ಹೊರಗೆ ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ಹಂಚಬೇಡಿ."}
+};
+const OPS=["my_side","neutral","opposite","unknown"];
+const OPCLS={my_side:"my",neutral:"neutral",opposite:"opp",unknown:"unk"};
+const LOGIN_DOMAIN="@login.local";
+const PAGE=50;
+const ICONS={
+ dashboard:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+ voters:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 4.5a3 3 0 0 1 0 6M18 14c2 .8 3 2.9 3 6"/>',
+ team:'<path d="M12 3 4 7v5c0 4.5 3.4 8.2 8 9 4.6-.8 8-4.5 8-9V7z"/><path d="m9 12 2 2 4-4"/>'
+};
+
+/* ================= state & utils ================= */
+const CFG=window.CAMPAIGN_CONFIG||{};
+const S={lang:"kn",tab:"dashboard",sb:null,me:null,wards:[],members:[],issues:[],summary:[],issueSum:[],activity:[],
+ dashWard:null,vWard:"",q:"",op:"",sort:"name",voters:[],vCount:0,vLoading:false,armed:null,busy:false};
+try{const l=localStorage.getItem("cd.lang");if(l==="en"||l==="kn")S.lang=l;const tb=localStorage.getItem("cd.tab");if(tb&&ICONS[tb])S.tab=tb}catch(e){}
+const t=k=>(T[S.lang][k]??T.en[k]??k);
+const L=o=>o?((S.lang==="kn"?(o.kn||o.en):(o.en||o.kn))||""):"";
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num=n=>new Intl.NumberFormat("en-IN").format(n||0);
+const pct=(a,b)=>b?Math.round(a*100/b):0;
+const $=id=>document.getElementById(id);
+function store(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function toast(msg){const el=$("toast");el.textContent=msg;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2800)}
+function errText(e){
+  const m=String(e?.message||e||"");
+  for(const c of ["LOGIN_TAKEN","LOGIN_FORMAT","PASSWORD_SHORT","NOT_ALLOWED","WARD_REQUIRED","NAME_REQUIRED"])if(m.includes(c))return t("E_"+c);
+  if(/epic_no/.test(m))return t("E_EPIC");
+  if(/foreign key/.test(m))return t("E_WARD_IN_USE");
+  if(/row-level security|permission denied/i.test(m))return t("E_NOT_ALLOWED");
+  if(/Failed to fetch|NetworkError|network/i.test(m))return t("E_NET");
+  if(/at least 6|Password should/i.test(m))return t("E_PASSWORD_SHORT");
+  console.error(e);return t("E_GENERIC");
+}
+const wardById=id=>S.wards.find(w=>w.id===id);
+const wardLabel=w=>w?`${t("ward")} ${w.number?w.number+" · ":""}${w.name}`:"";
+const memberById=id=>S.members.find(m=>m.user_id===id);
+const isMla=()=>S.me?.role==="mla";
+const isLeader=()=>S.me?.role==="ward_leader";
+const canManageVoters=()=>isMla()||isLeader();
+function canManage(m){return m&&m.user_id!==S.me.user_id&&m.role!=="mla"&&(isMla()||(isLeader()&&m.role==="worker"&&m.ward_id===S.me.ward_id))}
+const sortedWards=()=>[...S.wards].sort((a,b)=>(parseInt(a.number)||1e9)-(parseInt(b.number)||1e9)||String(a.number||"").localeCompare(String(b.number||""))||a.name.localeCompare(b.name));
+function genPw(){const a="abcdefghjkmnpqrstuvwxyz23456789";let s="";const r=crypto.getRandomValues(new Uint32Array(8));for(const x of r)s+=a[x%a.length];return s}
+async function copyText(txt){if(window.AndroidBridge){AndroidBridge.copyText(txt);toast(t("copied"));return}try{await navigator.clipboard.writeText(txt);toast(t("copied"))}catch(e){const ta=document.createElement("textarea");ta.value=txt;document.body.append(ta);ta.select();try{document.execCommand("copy");toast(t("copied"))}catch(_){}ta.remove()}}
+
+/* ================= boot / auth ================= */
+const configured=CFG.SUPABASE_URL&&!/YOUR-PROJECT/.test(CFG.SUPABASE_URL)&&CFG.SUPABASE_ANON_KEY&&!/PASTE-YOUR/.test(CFG.SUPABASE_ANON_KEY);
+function viewNotConfigured(){
+  $("app").innerHTML=`<div class="login">${langToggle()}<div class="mark" aria-hidden="true"></div><h2>${esc(t("notConfigured"))}</h2><p class="sub">${esc(t("notConfiguredB"))}</p></div>`;
+}
+function langToggle(){return `<div class="langs" role="group" aria-label="Language" style="align-self:flex-end"><button type="button" data-lang="kn" aria-pressed="${S.lang==="kn"}">ಕನ್ನಡ</button><button type="button" data-lang="en" aria-pressed="${S.lang==="en"}">EN</button></div>`}
+const cname=()=>S.lang==="kn"?(CFG.CONSTITUENCY_KN||CFG.CONSTITUENCY_EN||""):(CFG.CONSTITUENCY_EN||"");
+function viewLogin(msg){
+  $("tabbar").hidden=true;
+  $("app").innerHTML=`<form class="login" id="loginForm" autocomplete="on">
+   ${langToggle()}
+   <div class="mark" aria-hidden="true"></div>
+   <div><h2>${esc(cname())} ${esc(t("app"))}</h2><p class="sub">${esc(t("loginTitle"))}</p></div>
+   ${msg?`<div class="note bad">${esc(msg)}</div>`:""}
+   <label class="f">${esc(t("loginId"))}<input type="text" id="li-id" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username" required></label>
+   <label class="f">${esc(t("password"))}<input type="password" id="li-pw" autocomplete="current-password" required></label>
+   <button class="btn primary big" type="submit" id="li-go">${esc(t("signIn"))}</button>
+  </form>`;
+}
+async function doLogin(){
+  const id=$("li-id").value.trim().toLowerCase(),pw=$("li-pw").value;if(!id||!pw)return;
+  $("li-go").disabled=true;
+  const {error}=await S.sb.auth.signInWithPassword({email:id+LOGIN_DOMAIN,password:pw});
+  if(error){viewLogin(/Invalid login/i.test(error.message)?t("badLogin"):errText(error));$("li-id").value=id;return}
+  await afterLogin();
+}
+async function afterLogin(){
+  const {data:{session}}=await S.sb.auth.getSession();
+  if(!session){viewLogin();return}
+  $("app").innerHTML=`<div class="empty" style="margin-top:20vh"><div class="spin"></div></div>`;
+  const {data:me,error}=await S.sb.from("members").select("*").eq("user_id",session.user.id).maybeSingle();
+  if(error){viewLogin(errText(error));return}
+  if(!me||!me.active){await S.sb.auth.signOut();viewLogin(t("inactive"));return}
+  S.me=me;
+  if(!isMla()){S.vWard=me.ward_id;S.dashWard=me.ward_id}
+  await loadAll();
+  render();
+  if(S.tab==="voters")loadVoters(true);
+}
+async function loadAll(){
+  const scope=isMla()?null:S.me.ward_id;
+  const [w,m,i,s,is,a]=await Promise.all([
+    S.sb.from("wards").select("*"),
+    S.sb.from("members").select("*"),
+    S.sb.from("issues").select("*").order("sort"),
+    S.sb.rpc("ward_summary"),
+    S.sb.rpc("issue_summary",{p_ward:S.dashWard||scope}),
+    S.sb.rpc("team_activity",{p_ward:scope})
+  ]);
+  for(const r of [w,m,i,s,is,a])if(r.error){toast(errText(r.error));break}
+  S.wards=w.data||[];S.members=m.data||[];S.issues=i.data||[];S.summary=s.data||[];S.issueSum=is.data||[];S.activity=a.data||[];
+  if(isMla()&&!S.vWard&&S.wards.length)S.vWard=sortedWards()[0].id;
+}
+let sumT;
+function refreshSummarySoon(){clearTimeout(sumT);sumT=setTimeout(async()=>{
+  const [s,is,a]=await Promise.all([S.sb.rpc("ward_summary"),S.sb.rpc("issue_summary",{p_ward:S.dashWard||(isMla()?null:S.me.ward_id)}),S.sb.rpc("team_activity",{p_ward:isMla()?null:S.me.ward_id})]);
+  if(!s.error)S.summary=s.data;if(!is.error)S.issueSum=is.data;if(!a.error)S.activity=a.data;
+  if(S.tab!=="voters")render();
+},700)}
+
+/* ================= chrome ================= */
+function render(){
+  if(!S.me){viewLogin();return}
+  document.documentElement.lang=S.lang;
+  const tabs=["dashboard","voters","team"];
+  $("tabbar").hidden=false;
+  $("tabs").innerHTML=tabs.map(k=>`<button type="button" data-tab="${k}" ${S.tab===k?'aria-current="page"':""}><svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[k]}</svg><span>${esc(t(k))}</span></button>`).join("");
+  const sub=t(S.me.role)+(S.me.ward_id?" · "+wardLabel(wardById(S.me.ward_id)):" · "+cname());
+  const initials=(S.me.full_name||"?").trim().split(/\s+/).map(x=>x[0]).slice(0,2).join("").toUpperCase();
+  const focusId=document.activeElement?.id;const caret=document.activeElement?.selectionStart;
+  $("app").innerHTML=`<header class="top"><div class="brand"><div class="mark" aria-hidden="true"></div><div style="min-width:0"><h1>${esc(cname())} ${esc(t("app"))}</h1><small>${esc(S.me.full_name)} · ${esc(sub)}</small></div></div>
+   <div class="langs" role="group" aria-label="Language"><button type="button" data-lang="kn" aria-pressed="${S.lang==="kn"}">ಕನ್ನಡ</button><button type="button" data-lang="en" aria-pressed="${S.lang==="en"}">EN</button></div>
+   <button class="acct" type="button" id="acct" aria-label="${esc(t("account"))}">${esc(initials)}</button></header>
+   <main>${({dashboard:vDashboard,voters:vVoters,team:vTeam})[S.tab]()}</main>`;
+  if(focusId){const el=$(focusId);if(el){el.focus({preventScroll:true});if(caret!=null&&el.setSelectionRange){try{el.setSelectionRange(caret,caret)}catch(e){}}}}
+}
+
+/* ================= dashboard ================= */
+function sumFor(wardId){
+  const rows=wardId?S.summary.filter(r=>r.ward_id===wardId):S.summary;
+  const o={total:0,my_side:0,neutral:0,opposite:0,unknown:0};
+  for(const r of rows)for(const k in o)o[k]+=Number(r[k])||0;
+  return o;
+}
+function donut(s){
+  const R=60,C=2*Math.PI*R,gap=s.total>0?2:0;let off=0;
+  const segs=OPS.map(k=>({k,v:s[k]})).filter(x=>x.v>0);
+  const arcs=segs.map(x=>{const len=C*x.v/s.total;const d=Math.max(0,len-(segs.length>1?gap:0));const el=`<circle r="${R}" cx="80" cy="80" fill="none" stroke="var(--${({my_side:"my",neutral:"neu",opposite:"opp",unknown:"unk"})[x.k]})" stroke-width="22" stroke-dasharray="${d} ${C-d}" stroke-dashoffset="${-off}" transform="rotate(-90 80 80)"><title>${esc(t(x.k))}: ${num(x.v)} (${pct(x.v,s.total)}%)</title></circle>`;off+=len;return el}).join("");
+  return `<svg class="donut" viewBox="0 0 160 160" role="img" aria-label="${esc(t("opinion"))}">
+    ${s.total?"":`<circle r="${R}" cx="80" cy="80" fill="none" stroke="var(--sunk)" stroke-width="22"/>`}${arcs}
+    <text x="80" y="80" text-anchor="middle" font-size="26" font-weight="700">${pct(s.my_side,s.total)}%</text>
+    <text x="80" y="98" text-anchor="middle" class="lbl">${esc(t("my_side"))}</text></svg>`;
+}
+function legend(s){
+  return `<ul class="legend">${OPS.map(k=>`<li><span class="dot ${OPCLS[k]}"></span><span>${esc(t(k))}</span><span class="v"><b>${pct(s[k],s.total)}%</b> · ${num(s[k])}</span></li>`).join("")}</ul>`;
+}
+function stack(s){
+  if(!s.total)return `<div class="stack empty-bar"></div>`;
+  return `<div class="stack">${OPS.filter(k=>s[k]>0).map(k=>`<i class="${OPCLS[k]}" style="flex:${s[k]} 1 0" title="${esc(t(k))}: ${num(s[k])} (${pct(s[k],s.total)}%)"></i>`).join("")}</div>`;
+}
+function vDashboard(){
+  const scopeWard=S.dashWard;
+  const s=sumFor(scopeWard);
+  const w=scopeWard?wardById(scopeWard):null;
+  let out=`<div class="section-head"><div>${isMla()&&scopeWard?`<button class="btn sm ghost" type="button" id="dash-back" style="padding-left:0">← ${esc(t("back"))}</button>`:""}<h2>${esc(w?wardLabel(w):t("constituency")+" · "+cname())}</h2><p class="sub">${esc(t("privacy"))}</p></div></div>
+  <div class="tiles">
+   <div class="tile"><span>${esc(t("total"))}</span><b>${num(s.total)}</b><small>${num(s.unknown)} ${esc(t("unknown"))}</small></div>
+   ${["my_side","neutral","opposite"].map(k=>`<div class="tile"><span><i class="dot ${OPCLS[k]}"></i>${esc(t(k))}</span><b>${pct(s[k],s.total)}%</b><small>${num(s[k])}</small></div>`).join("")}
+  </div>
+  <div class="panel"><h3>${esc(t("opinion"))}</h3><div class="donut-wrap">${donut(s)}${legend(s)}</div></div>`;
+  if(isMla()&&!scopeWard){
+    const ws=sortedWards();
+    out+=`<div class="panel"><div><h3>${esc(t("byWard"))}</h3><p class="sub">${esc(t("tapWard"))}</p></div>${ws.length?`<ul class="wards">${ws.map(wd=>{const x=sumFor(wd.id);return `<li><button class="wardrow" type="button" data-dward="${esc(wd.id)}"><span class="wname">${esc(wardLabel(wd))}</span><span class="wtot">${num(x.total)} ${esc(t("votersN"))}</span>${stack(x)}<span class="wpct">${["my_side","neutral","opposite"].map(k=>`<span><i class="dot ${OPCLS[k]}"></i>${esc(t(k))} ${pct(x[k],x.total)}%</span>`).join("")}</span></button></li>`}).join("")}</ul>`:`<p class="sub" style="margin:0">—</p>`}</div>`;
+  }
+  // issues
+  const isum=[...S.issueSum].map(r=>({l:L(S.issues.find(i=>i.id===r.issue_id))||"—",n:Number(r.n)})).sort((a,b)=>b.n-a.n).slice(0,10);
+  const maxI=isum[0]?.n||0;
+  out+=`<div class="panel"><h3>${esc(t("topIssues"))}</h3>${isum.length?`<div class="bars">${isum.map(r=>`<div class="bar"><span>${esc(r.l)}</span><span class="val">${num(r.n)} · ${pct(r.n,s.total)}%</span><div class="track"><div class="fill" style="width:${pct(r.n,maxI)}%"></div></div></div>`).join("")}</div>`:`<p class="sub" style="margin:0">${esc(t("noIssues"))}</p>`}</div>`;
+  // team activity
+  if(canManageVoters()){
+    const wid=scopeWard||(isMla()?null:S.me.ward_id);
+    const rows=S.activity.map(a=>({m:memberById(a.user_id),a})).filter(x=>x.m&&x.m.active&&(!wid||x.m.ward_id===wid)&&(Number(x.a.voters_added)||Number(x.a.voters_updated))).sort((x,y)=>y.a.voters_updated-x.a.voters_updated).slice(0,15);
+    if(rows.length)out+=`<div class="panel"><h3>${esc(t("teamWork"))}</h3><ul class="mlist">${rows.map(x=>`<li class="member"><div class="grow"><div class="t">${esc(x.m.full_name)} <span class="role ${x.m.role}">${esc(t(x.m.role))}</span></div><div class="m">${esc(wardLabel(wardById(x.m.ward_id))||cname())}</div></div><span class="code">${esc(t("added"))} ${num(x.a.voters_added)} · ${esc(t("updated"))} ${num(x.a.voters_updated)}</span></li>`).join("")}</ul></div>`;
+  }
+  return out;
+}
+
+/* ================= voters ================= */
+function vVoters(){
+  if(!S.wards.length)return `<div class="panel"><div class="empty"><h3>${esc(t("wards"))}: 0</h3><p style="margin:0">${esc(isMla()?t("addWard"):t("E_WARD_REQUIRED"))}</p>${isMla()?`<button class="btn primary" data-tab="team" type="button">${esc(t("team"))}</button>`:""}</div></div>`;
+  const s=sumFor(S.vWard||null);
+  const counts={my_side:s.my_side,neutral:s.neutral,opposite:s.opposite,unknown:s.unknown};
+  const list=S.voters.map(v=>{
+    const meta=[v.house_no?"#"+v.house_no:"",[v.age||"",v.gender?(S.lang==="en"?t(v.gender)[0]:t(v.gender)):""].filter(Boolean).join(" "),v.epic_no||"",(!S.vWard&&isMla())?wardLabel(wardById(v.ward_id)):""].filter(Boolean).join(" · ");
+    return `<li class="voter"><button class="v-main" type="button" data-vedit="${esc(v.id)}"><span class="v-name">${esc(v.full_name)}</span><span class="v-meta">${esc(meta)||"&nbsp;"}</span></button>
+     <div class="opseg" role="group" aria-label="${esc(t("opinion"))}">${["my_side","neutral","opposite"].map(o=>`<button type="button" data-vop="${esc(v.id)}" data-op="${o}" aria-pressed="${v.opinion===o}">${esc(t(o))}</button>`).join("")}</div></li>`;
+  }).join("");
+  const filtered=S.q||S.op;
+  return `<div class="section-head"><div><h2>${esc(t("voters"))}</h2><p class="sub">${num(S.vCount)} ${S.voters.length<S.vCount?"· "+num(S.voters.length)+" "+esc(t("shown")):""}</p></div>
+   <div class="row" style="flex:0 1 auto;justify-content:flex-end">${canManageVoters()?`<button class="btn fit" type="button" id="v-import">${esc(t("importCsv"))}</button><button class="btn fit" type="button" id="v-export">${esc(t("exportCsv"))}</button>`:""}<button class="btn primary fit" type="button" id="v-add">+ ${esc(t("addVoter"))}</button></div></div>
+  <div class="panel">
+   <div class="row">
+    ${isMla()?`<label class="f">${esc(t("ward"))}<select id="v-ward"><option value="">${esc(t("allWards"))}</option>${sortedWards().map(w=>`<option value="${esc(w.id)}" ${w.id===S.vWard?"selected":""}>${esc(wardLabel(w))}</option>`).join("")}</select></label>`:""}
+    <label class="f" style="flex:2 1 220px">${esc(t("search"))}<input type="search" id="v-q" value="${esc(S.q)}" autocomplete="off"></label>
+    <label class="f" style="flex:0 1 160px">${esc(t("sort"))}<select id="v-sort">${[["name","sortName"],["house","sortHouse"],["recent","sortRecent"]].map(([k,l])=>`<option value="${k}" ${S.sort===k?"selected":""}>${esc(t(l))}</option>`).join("")}</select></label>
+   </div>
+   <div class="chips">${OPS.map(o=>`<button type="button" class="chip" data-vfilter="${o}" aria-pressed="${S.op===o}"><i class="dot ${OPCLS[o]}"></i> ${esc(t(o))}<span class="n">${num(counts[o])}</span></button>`).join("")}</div>
+  </div>
+  <div class="panel">${S.vLoading&&!S.voters.length?`<div class="empty"><div class="spin"></div></div>`:S.voters.length?`<ul class="vlist">${list}</ul>${S.voters.length<S.vCount?`<button class="btn" type="button" id="v-more" ${S.vLoading?"disabled":""}>${esc(t("showMore"))}</button>`:""}`:
+   filtered?`<p class="sub" style="margin:0">${esc(t("noVoters"))}</p>`:`<div class="empty"><h3>${esc(t("noVotersYet"))}</h3><p style="margin:0">${esc(t("noVotersYetB"))}</p></div>`}</div>`;
+}
+function voterQuery(sel,opts){
+  let q=S.sb.from("voters").select(sel,opts);
+  if(S.vWard)q=q.eq("ward_id",S.vWard);
+  if(S.op)q=q.eq("opinion",S.op);
+  const term=S.q.trim().replace(/[,()%*\\]/g," ").trim();
+  if(term){const p=`%${term}%`;q=q.or(`full_name.ilike.${p},house_no.ilike.${p},epic_no.ilike.${p},phone.ilike.${p}`)}
+  return q;
+}
+let vReq=0;
+async function loadVoters(reset){
+  const my=++vReq;S.vLoading=true;if(reset){S.voters=[];render()}else render();
+  let q=voterQuery("*",{count:"exact"});
+  if(S.sort==="house")q=q.order("house_no",{ascending:true,nullsFirst:false}).order("full_name");
+  else if(S.sort==="recent")q=q.order("updated_at",{ascending:false});
+  else q=q.order("full_name");
+  const from=reset?0:S.voters.length;
+  const {data,count,error}=await q.range(from,from+PAGE-1);
+  if(my!==vReq)return;
+  S.vLoading=false;
+  if(error){toast(errText(error));render();return}
+  S.voters=reset?data:S.voters.concat(data);S.vCount=count??S.voters.length;
+  if(S.tab==="voters")render();
+}
+async function setOpinion(id,op){
+  const v=S.voters.find(x=>x.id===id);if(!v)return;
+  const prev=v.opinion;const next=prev===op?"unknown":op;
+  v.opinion=next;render();
+  const {error}=await S.sb.from("voters").update({opinion:next}).eq("id",id);
+  if(error){v.opinion=prev;render();toast(errText(error));return}
+  bumpSummary(v.ward_id,prev,next);
+}
+function bumpSummary(ward,prev,next){
+  const r=S.summary.find(x=>x.ward_id===ward);
+  if(r){r[prev]=Math.max(0,Number(r[prev])-1);r[next]=Number(r[next])+1}
+  refreshSummarySoon();
+}
+
+/* voter sheet */
+function openVoter(v){
+  const isNew=!v;v=v||{ward_id:S.vWard||S.me.ward_id||"",opinion:"unknown",issues:[]};
+  const wardSel=isMla()?`<label class="f">${esc(t("ward"))}<select id="vf-ward">${sortedWards().map(w=>`<option value="${esc(w.id)}" ${w.id===v.ward_id?"selected":""}>${esc(wardLabel(w))}</option>`).join("")}</select></label>`:"";
+  const by=!isNew&&v.updated_by?memberById(v.updated_by):null;
+  openSheet(`<div class="sheet-head"><h3>${esc(isNew?t("addVoter"):t("editVoter"))}</h3><button class="btn ghost sm" type="button" data-close>✕</button></div>
+   ${wardSel}
+   <label class="f">${esc(t("fullName"))} *<input type="text" id="vf-name" value="${esc(v.full_name||"")}" autocomplete="off"></label>
+   <div class="row">
+    <label class="f">${esc(t("houseNo"))}<input type="text" id="vf-house" value="${esc(v.house_no||"")}"></label>
+    <label class="f" style="flex:0 1 100px">${esc(t("age"))}<input type="number" id="vf-age" min="18" max="125" inputmode="numeric" value="${esc(v.age||"")}"></label>
+   </div>
+   <div class="f"><span style="font-size:.82rem;color:var(--muted);font-weight:500">${esc(t("gender"))}</span><div class="chips" id="vf-gender">${["male","female","other"].map(g=>`<button type="button" class="chip" data-pick="${g}" aria-pressed="${v.gender===g}">${esc(t(g))}</button>`).join("")}</div></div>
+   <div class="f"><span style="font-size:.82rem;color:var(--muted);font-weight:500">${esc(t("opinion"))}</span><div class="opseg big" id="vf-op">${["my_side","neutral","opposite"].map(o=>`<button type="button" data-op="${o}" data-pick="${o}" aria-pressed="${v.opinion===o}">${esc(t(o))}</button>`).join("")}</div></div>
+   <div class="f"><span style="font-size:.82rem;color:var(--muted);font-weight:500">${esc(t("issues"))}</span><div class="chips" id="vf-issues">${S.issues.map(i=>`<button type="button" class="chip" data-multi="${esc(i.id)}" aria-pressed="${(v.issues||[]).includes(i.id)}">${esc(L(i))}</button>`).join("")}</div></div>
+   <div class="row">
+    <label class="f">${esc(t("epic"))}<input type="text" id="vf-epic" value="${esc(v.epic_no||"")}" autocapitalize="characters"></label>
+    <label class="f">${esc(t("phone"))}<input type="tel" id="vf-phone" value="${esc(v.phone||"")}" inputmode="tel"></label>
+   </div>
+   <label style="display:flex;gap:8px;align-items:flex-start;font-size:.88rem"><input type="checkbox" id="vf-consent" ${v.consent?"checked":""} style="margin-top:4px">${esc(t("consent"))}</label>
+   <p class="sub" style="margin:-8px 0 0;font-size:.8rem">${esc(t("consentNote"))}</p>
+   <label class="f">${esc(t("notes"))}<textarea id="vf-notes">${esc(v.notes||"")}</textarea></label>
+   ${by?`<p class="sub" style="margin:0;font-size:.8rem">${esc(t("lastBy"))}: ${esc(by.full_name)} · ${new Date(v.updated_at).toLocaleString(S.lang==="kn"?"kn-IN":"en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"})}</p>`:""}
+   <div id="vf-err"></div>
+   <div class="row"><span style="flex:1 1 0"></span>${!isNew&&canManageVoters()?`<button class="btn danger fit" type="button" id="vf-del" data-id="${esc(v.id)}">${esc(t("del"))}</button>`:""}<button class="btn primary fit" type="button" id="vf-save" data-id="${esc(v.id||"")}">${esc(t("save"))}</button></div>`);
+  setTimeout(()=>{if(isNew)$("vf-name")?.focus()},50);
+}
+function picked(container){const el=$(container)?.querySelector('[aria-pressed="true"]');return el?el.dataset.pick:null}
+async function saveVoter(id){
+  const name=$("vf-name").value.trim();if(!name){$("vf-err").innerHTML=`<div class="note bad">${esc(t("E_NAME_REQUIRED"))}</div>`;$("vf-name").focus();return}
+  const age=parseInt($("vf-age").value);
+  const body={full_name:name,house_no:$("vf-house").value.trim()||null,age:age>=18&&age<=125?age:null,gender:picked("vf-gender"),
+   opinion:picked("vf-op")||"unknown",issues:[...$("vf-issues").querySelectorAll('[aria-pressed="true"]')].map(b=>b.dataset.multi),
+   epic_no:$("vf-epic").value.trim().toUpperCase()||null,phone:$("vf-phone").value.trim()||null,consent:$("vf-consent").checked,notes:$("vf-notes").value.trim()||null};
+  body.ward_id=isMla()?$("vf-ward").value:S.me.ward_id;
+  $("vf-save").disabled=true;
+  const res=id?await S.sb.from("voters").update(body).eq("id",id).select().single():await S.sb.from("voters").insert(body).select().single();
+  if(res.error){$("vf-save").disabled=false;$("vf-err").innerHTML=`<div class="note bad">${esc(errText(res.error))}</div>`;return}
+  closeSheet();toast(t("saved"));
+  if(id){const i=S.voters.findIndex(v=>v.id===id);if(i>=0)S.voters[i]=res.data;render()}else loadVoters(true);
+  refreshSummarySoon();
+}
+async function deleteVoter(id,btn){
+  if(S.armed!=="v:"+id){S.armed="v:"+id;btn.classList.add("armed");btn.textContent=t("confirm");return}
+  S.armed=null;const {error}=await S.sb.from("voters").delete().eq("id",id);
+  if(error){toast(errText(error));return}
+  closeSheet();toast(t("deleted"));S.voters=S.voters.filter(v=>v.id!==id);S.vCount=Math.max(0,S.vCount-1);render();refreshSummarySoon();
+}
+
+/* csv */
+function parseCsv(text){
+  const rows=[];let row=[],f="",q=false;text=text.replace(/^﻿/,"");
+  for(let i=0;i<text.length;i++){const c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;else if(c===","){row.push(f);f=""}else if(c==="\n"){row.push(f);rows.push(row);row=[];f=""}else if(c!=="\r")f+=c}
+  if(f||row.length){row.push(f);rows.push(row)}
+  return rows.filter(r=>r.some(x=>x.trim()));
+}
+const COLS={full_name:/^(full[ _]?name|name|voter[ _]?name|ಹೆಸರು)$/i,house_no:/^(house[ _]?(no|number)?|door[ _]?(no|number)?|ಮನೆ.*)$/i,age:/^(age|ವಯಸ್ಸು)$/i,gender:/^(gender|sex|ಲಿಂಗ)$/i,phone:/^(phone|mobile|phone[ _]?no|ಫೋನ್)$/i,epic_no:/^(epic|epic[ _]?no|voter[ _]?id|epic[ _]?number)$/i,opinion:/^(opinion|ಅಭಿಪ್ರಾಯ)$/i};
+function mapGender(s){s=String(s||"").trim().toLowerCase();if(/^(m|male|ಪುರುಷ|ಪು)$/.test(s))return"male";if(/^(f|female|ಮಹಿಳೆ|ಸ್ತ್ರೀ|ಮ)$/.test(s))return"female";if(/^(o|other|t|tg|ಇತರೆ)$/.test(s))return"other";return null}
+function mapOpinion(s){s=String(s||"").trim().toLowerCase();if(/my|our|ನಮ್ಮ|support|favour/.test(s))return"my_side";if(/neutral|ತಟಸ್ಥ/.test(s))return"neutral";if(/opp|against|ವಿರೋಧ/.test(s))return"opposite";return"unknown"}
+function openImport(){
+  const wsel=isMla()?`<label class="f">${esc(t("importInto"))}<select id="im-ward">${sortedWards().map(w=>`<option value="${esc(w.id)}" ${w.id===S.vWard?"selected":""}>${esc(wardLabel(w))}</option>`).join("")}</select></label>`:`<p class="sub" style="margin:0">${esc(t("importInto"))}: <b>${esc(wardLabel(wardById(S.me.ward_id)))}</b></p>`;
+  openSheet(`<div class="sheet-head"><h3>${esc(t("importTitle"))}</h3><button class="btn ghost sm" type="button" data-close>✕</button></div>
+   <p class="note" style="margin:0">${esc(t("importHelp"))}</p>${wsel}
+   <label class="f">${esc(t("chooseFile"))}<input type="file" id="im-file" accept=".csv,text/csv"></label>
+   <div id="im-info"></div>
+   <div class="row"><span style="flex:1 1 0"></span><button class="btn primary fit" type="button" id="im-go" disabled>${esc(t("doImport"))}</button></div>`);
+}
+let importRows=[];
+async function readImport(file){
+  const rows=parseCsv(await file.text());const head=(rows.shift()||[]).map(h=>h.trim());
+  const idx={};for(const k in COLS){const i=head.findIndex(h=>COLS[k].test(h));if(i>=0)idx[k]=i}
+  const info=$("im-info");
+  if(idx.full_name==null){info.innerHTML=`<div class="note bad">${esc(t("noNameCol"))}</div>`;$("im-go").disabled=true;importRows=[];return}
+  importRows=rows.map(r=>{const g=k=>idx[k]!=null?(r[idx[k]]||"").trim():"";const age=parseInt(g("age"));return {full_name:g("full_name"),house_no:g("house_no")||null,age:age>=18&&age<=125?age:null,gender:mapGender(g("gender")),phone:g("phone")||null,epic_no:g("epic_no").toUpperCase()||null,opinion:mapOpinion(g("opinion"))}}).filter(r=>r.full_name);
+  info.innerHTML=`<div class="note"><b>${num(importRows.length)}</b> ${esc(t("rowsFound"))}</div>`;$("im-go").disabled=!importRows.length;
+}
+async function runImport(){
+  const ward=isMla()?$("im-ward").value:S.me.ward_id;if(!ward||!importRows.length)return;
+  const btn=$("im-go");btn.disabled=true;let done=0,ins=0;
+  for(let i=0;i<importRows.length;i+=500){
+    btn.textContent=`${t("importing")} ${pct(i,importRows.length)}%`;
+    const chunk=importRows.slice(i,i+500).map(r=>({...r,ward_id:ward}));
+    const {data,error}=await S.sb.from("voters").upsert(chunk,{onConflict:"epic_no",ignoreDuplicates:true}).select("id");
+    if(error){$("im-info").innerHTML=`<div class="note bad">${esc(errText(error))} (${num(done)} ${esc(t("imported"))})</div>`;btn.textContent=t("doImport");btn.disabled=false;return}
+    done+=chunk.length;ins+=(data||[]).length;
+  }
+  closeSheet();toast(`${t("imported")}: ${num(ins)} · ${num(done-ins)} ${t("skipped")}`);
+  if(isMla())S.vWard=ward;loadVoters(true);refreshSummarySoon();
+}
+async function exportCsv(){
+  const btn=$("v-export");btn.disabled=true;
+  const all=[];for(let from=0;;from+=1000){const {data,error}=await voterQuery("*").order("full_name").range(from,from+999);if(error){toast(errText(error));btn.disabled=false;return}all.push(...data);if(data.length<1000)break}
+  const cell=v=>{const s=String(v??"");return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+  const iss=id=>S.issues.find(i=>i.id===id)?.en||"";
+  const head=["ward_number","ward_name","name","house_no","age","gender","phone","epic_no","opinion","issues","notes","phone_consent","updated_by","updated_at"];
+  const rows=all.map(v=>{const w=wardById(v.ward_id)||{};return [w.number,w.name,v.full_name,v.house_no,v.age,v.gender,v.phone,v.epic_no,v.opinion,(v.issues||[]).map(iss).join("; "),v.notes,v.consent?"yes":"no",memberById(v.updated_by)?.full_name||"",v.updated_at]});
+  const csv="﻿"+[head,...rows].map(r=>r.map(cell).join(",")).join("\n");
+  const w=wardById(S.vWard);const name=`voters-${w?("ward-"+(w.number||w.name)):"all"}-${new Date().toISOString().slice(0,10)}.csv`.replace(/[^\w.-]/g,"-");
+  if(window.AndroidBridge){AndroidBridge.shareFile(name,csv);btn.disabled=false;return}
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download=name;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
+  btn.disabled=false;
+}
+
+/* ================= team ================= */
+function memberRow(m){
+  const act=S.activity.find(a=>a.user_id===m.user_id);
+  const actions=canManage(m)?`<div class="acts"><button class="btn sm ghost" type="button" data-medit="${esc(m.user_id)}">${esc(t("editMember"))}</button><button class="btn sm ghost" type="button" data-mpw="${esc(m.user_id)}">${esc(t("resetPw"))}</button>${m.active?`<button class="btn sm danger ${S.armed==="m:"+m.user_id?"armed":""}" type="button" data-mrm="${esc(m.user_id)}">${esc(S.armed==="m:"+m.user_id?t("confirm"):t("remove"))}</button>`:`<button class="btn sm" type="button" data-mrestore="${esc(m.user_id)}">${esc(t("restore"))}</button>`}</div>`:"";
+  return `<li class="member"><div class="grow"><div class="t">${esc(m.full_name)} <span class="role ${m.role}">${esc(t(m.role))}</span></div><div class="m"><span class="code">${esc(m.login_id)}</span>${m.phone?" · "+esc(m.phone):""}${act&&(Number(act.voters_added)||Number(act.voters_updated))?" · "+esc(t("added"))+" "+num(act.voters_added)+", "+esc(t("updated"))+" "+num(act.voters_updated):""}${!m.active&&m.ward_id?" · "+esc(wardLabel(wardById(m.ward_id))):""}</div></div>${actions}</li>`;
+}
+function wardBlock(w,open){
+  const ms=S.members.filter(m=>m.ward_id===w.id&&m.active);
+  const leaders=ms.filter(m=>m.role==="ward_leader"),workers=ms.filter(m=>m.role==="worker");
+  const s=sumFor(w.id);
+  const canAddWorker=isMla()||(isLeader()&&S.me.ward_id===w.id);
+  return `<details class="ward" ${open?"open":""}><summary><span style="flex:1;min-width:0"><b class="wname" style="font-family:var(--display);font-size:1.05rem">${esc(wardLabel(w))}</b><br><span class="sub" style="font-size:.8rem">${num(leaders.length)} ${esc(t("leaders"))} · ${num(workers.length)} ${esc(t("workers"))} · ${num(s.total)} ${esc(t("votersN"))} · ${esc(t("my_side"))} ${pct(s.my_side,s.total)}%</span></span></summary>
+   <div class="body">
+    <div class="row" style="justify-content:flex-start">${isMla()?`<button class="btn sm fit" type="button" data-addm="ward_leader" data-w="${esc(w.id)}">+ ${esc(t("addLeader"))}</button>`:""}${canAddWorker?`<button class="btn sm fit" type="button" data-addm="worker" data-w="${esc(w.id)}">+ ${esc(t("addWorker"))}</button>`:""}${isMla()?`<button class="btn sm ghost fit" type="button" data-wedit="${esc(w.id)}">${esc(t("editWard"))}</button><button class="btn sm ghost danger fit ${S.armed==="w:"+w.id?"armed":""}" type="button" data-wdel="${esc(w.id)}">${esc(S.armed==="w:"+w.id?t("confirm"):t("delWard"))}</button>`:""}</div>
+    <div><h3 style="font-size:.95rem;margin-bottom:2px">${esc(t("leaders"))}</h3>${leaders.length?`<ul class="mlist">${leaders.map(memberRow).join("")}</ul>`:`<p class="sub" style="margin:0">${esc(t("noLeader"))}</p>`}</div>
+    <div><h3 style="font-size:.95rem;margin-bottom:2px">${esc(t("workers"))}</h3>${workers.length?`<ul class="mlist">${workers.map(memberRow).join("")}</ul>`:`<p class="sub" style="margin:0">${esc(t("noWorkers"))}</p>`}</div>
+   </div></details>`;
+}
+function vTeam(){
+  let out=`<div class="section-head"><div><h2>${esc(t("team"))}</h2><p class="sub">${esc(isMla()?t("wards")+": "+num(S.wards.length):wardLabel(wardById(S.me.ward_id)))}</p></div>${isMla()?`<button class="btn primary fit" type="button" id="w-add">+ ${esc(t("addWard"))}</button>`:""}</div>`;
+  const ws=isMla()?sortedWards():S.wards.filter(w=>w.id===S.me.ward_id);
+  out+=ws.length?ws.map(w=>wardBlock(w,!isMla()||ws.length===1)).join(""):`<div class="panel"><div class="empty"><h3>${esc(t("wards"))}: 0</h3>${isMla()?`<button class="btn primary" type="button" id="w-add2">+ ${esc(t("addWard"))}</button>`:""}</div></div>`;
+  const removed=S.members.filter(m=>!m.active&&canManage(m));
+  if(removed.length)out+=`<details class="ward"><summary><span style="flex:1"><b style="font-family:var(--display)">${esc(t("removed"))}</b> <span class="code">${num(removed.length)}</span></span></summary><div class="body"><ul class="mlist">${removed.map(memberRow).join("")}</ul></div></details>`;
+  if(isMla()){
+    out+=`<div class="panel"><div><h3>${esc(t("setup"))}</h3><p class="sub">${esc(t("setupHelp"))}</p></div>
+     <ul class="mlist">${S.issues.map(i=>`<li class="member"><div class="grow row" style="gap:6px"><input type="text" id="is-kn-${esc(i.id)}" value="${esc(i.kn)}" aria-label="${esc(t("issueKn"))}"><input type="text" id="is-en-${esc(i.id)}" value="${esc(i.en)}" aria-label="${esc(t("issueEn"))}"></div><div class="acts"><button class="btn sm" type="button" data-issave="${esc(i.id)}">${esc(t("save"))}</button><button class="btn sm ghost danger ${S.armed==="i:"+i.id?"armed":""}" type="button" data-isdel="${esc(i.id)}">${esc(S.armed==="i:"+i.id?t("confirm"):"✕")}</button></div></li>`).join("")}</ul>
+     <div class="row"><input type="text" id="is-new-kn" placeholder="${esc(t("issueKn"))}" aria-label="${esc(t("issueKn"))}"><input type="text" id="is-new-en" placeholder="${esc(t("issueEn"))}" aria-label="${esc(t("issueEn"))}"><button class="btn fit" type="button" id="is-add">+ ${esc(t("addIssue"))}</button></div></div>`;
+  }
+  return out;
+}
+function openWard(w){
+  openSheet(`<div class="sheet-head"><h3>${esc(w?t("editWard"):t("addWard"))}</h3><button class="btn ghost sm" type="button" data-close>✕</button></div>
+   <div class="row"><label class="f" style="flex:0 1 120px">${esc(t("wardNo"))}<input type="text" id="wf-no" value="${esc(w?.number||"")}" inputmode="numeric"></label>
+   <label class="f">${esc(t("wardName"))} *<input type="text" id="wf-name" value="${esc(w?.name||"")}"></label></div>
+   <div id="wf-err"></div>
+   <div class="row"><span style="flex:1 1 0"></span><button class="btn primary fit" type="button" id="wf-save" data-id="${esc(w?.id||"")}">${esc(t("save"))}</button></div>`);
+  setTimeout(()=>$("wf-no")?.focus(),50);
+}
+async function saveWard(id){
+  const body={number:$("wf-no").value.trim()||null,name:$("wf-name").value.trim()};
+  if(!body.name){$("wf-err").innerHTML=`<div class="note bad">${esc(t("E_NAME_REQUIRED"))}</div>`;return}
+  const res=id?await S.sb.from("wards").update(body).eq("id",id).select().single():await S.sb.from("wards").insert(body).select().single();
+  if(res.error){$("wf-err").innerHTML=`<div class="note bad">${esc(errText(res.error))}</div>`;return}
+  if(id){const i=S.wards.findIndex(w=>w.id===id);S.wards[i]=res.data}else S.wards.push(res.data);
+  if(!S.vWard)S.vWard=res.data.id;
+  closeSheet();toast(t("saved"));render();
+}
+function openMember(role,wardId,m){
+  const edit=!!m;
+  const wsel=isMla()?`<label class="f">${esc(t("ward"))}<select id="mf-ward">${sortedWards().map(w=>`<option value="${esc(w.id)}" ${w.id===(m?.ward_id||wardId)?"selected":""}>${esc(wardLabel(w))}</option>`).join("")}</select></label>`:"";
+  openSheet(`<div class="sheet-head"><h3>${esc(edit?t("editMember"):role==="ward_leader"?t("addLeader"):t("addWorker"))}</h3><button class="btn ghost sm" type="button" data-close>✕</button></div>
+   ${wsel}
+   <label class="f">${esc(t("fullName"))} *<input type="text" id="mf-name" value="${esc(m?.full_name||"")}"></label>
+   <label class="f">${esc(t("phone"))}<input type="tel" id="mf-phone" value="${esc(m?.phone||"")}" inputmode="tel"></label>
+   ${edit?"":`<div class="row"><label class="f">${esc(t("loginId"))} *<input type="text" id="mf-login" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="ravi.w3"></label>
+   <label class="f">${esc(t("password"))} *<div style="display:flex;gap:6px"><input type="text" id="mf-pw" value="${genPw()}" autocomplete="off" spellcheck="false"><button class="btn sm" type="button" id="mf-gen">${esc(t("generate"))}</button></div></label></div>`}
+   <div id="mf-err"></div>
+   <div class="row"><span style="flex:1 1 0"></span><button class="btn primary fit" type="button" id="mf-save" data-role="${esc(role||"")}" data-w="${esc(wardId||"")}" data-id="${esc(m?.user_id||"")}">${esc(t("save"))}</button></div>`);
+  setTimeout(()=>$("mf-name")?.focus(),50);
+}
+async function saveMember(btn){
+  const name=$("mf-name").value.trim(),phone=$("mf-phone").value.trim();
+  const ward=isMla()?$("mf-ward").value:S.me.ward_id;
+  const err=e=>{$("mf-err").innerHTML=`<div class="note bad">${esc(errText(e))}</div>`;btn.disabled=false};
+  btn.disabled=true;
+  if(btn.dataset.id){
+    const {error}=await S.sb.rpc("update_member",{p_user:btn.dataset.id,p_full_name:name,p_phone:phone,p_ward:ward});
+    if(error)return err(error);
+    const m=memberById(btn.dataset.id);Object.assign(m,{full_name:name||m.full_name,phone:phone||null,ward_id:ward});
+    closeSheet();toast(t("saved"));render();return;
+  }
+  const login=$("mf-login").value.trim().toLowerCase(),pw=$("mf-pw").value;
+  const {data:uid,error}=await S.sb.rpc("create_member",{p_login:login,p_password:pw,p_full_name:name,p_phone:phone,p_role:btn.dataset.role,p_ward:ward});
+  if(error)return err(error);
+  S.members.push({user_id:uid,login_id:login,full_name:name,phone:phone||null,role:btn.dataset.role,ward_id:ward,active:true});
+  render();showCreds(name,login,pw);
+}
+function showCreds(name,login,pw){
+  const link=location.origin+location.pathname;
+  const txt=`${cname()} ${t("app")}\n${t("appLink")}: ${link}\n${t("loginId")}: ${login}\n${t("password")}: ${pw}`;
+  openSheet(`<div class="sheet-head"><h3>${esc(t("created"))}</h3><button class="btn ghost sm" type="button" data-close>✕</button></div>
+   <p style="margin:0">${esc(t("shareCreds"))} <b>${esc(name)}</b></p><div class="cred" id="cred-txt">${esc(txt)}</div>
+   <div class="row"><span style="flex:1 1 0"></span><button class="btn fit" type="button" id="cred-copy">${esc(t("copy"))}</button><button class="btn primary fit" type="button" data-close>${esc(t("done"))}</button></div>`);
+  $("cred-copy").onclick=()=>copyText(txt);
+}
+function openResetPw(m){
+  const pw=genPw();
+  openSheet(`<div class="sheet-head"><h3>${esc(t("resetPw"))}: ${esc(m.full_name)}</h3><button class="btn ghost sm" type="button" data-close>✕</button></div>
+   <label class="f">${esc(t("newPw"))}<div style="display:flex;gap:6px"><input type="text" id="rp-pw" value="${pw}" autocomplete="off" spellcheck="false"><button class="btn sm" type="button" id="rp-gen">${esc(t("generate"))}</button></div></label>
+   <div id="rp-err"></div>
+   <div class="row"><span style="flex:1 1 0"></span><button class="btn primary fit" type="button" id="rp-save" data-id="${esc(m.user_id)}">${esc(t("save"))}</button></div>`);
+}
+async function saveResetPw(id){
+  const pw=$("rp-pw").value;const {error}=await S.sb.rpc("reset_member_password",{p_user:id,p_password:pw});
+  if(error){$("rp-err").innerHTML=`<div class="note bad">${esc(errText(error))}</div>`;return}
+  const m=memberById(id);showCreds(m.full_name,m.login_id,pw);
+}
+async function setActive(id,active){
+  const {error}=await S.sb.rpc("set_member_active",{p_user:id,p_active:active});
+  if(error){toast(errText(error));return}
+  memberById(id).active=active;toast(t("saved"));render();
+}
+
+/* account */
+function openAccount(){
+  openSheet(`<div class="sheet-head"><h3>${esc(t("account"))}</h3><button class="btn ghost sm" type="button" data-close>✕</button></div>
+   <p style="margin:0"><b>${esc(S.me.full_name)}</b> <span class="role ${S.me.role}">${esc(t(S.me.role))}</span><br><span class="code">${esc(S.me.login_id)}</span></p>
+   <label class="f">${esc(t("newPw"))}<input type="password" id="ac-pw" autocomplete="new-password"></label>
+   <div id="ac-err"></div>
+   <div class="row"><button class="btn danger fit" type="button" id="ac-out">${esc(t("signOut"))}</button><span style="flex:1 1 0"></span><button class="btn primary fit" type="button" id="ac-save">${esc(t("changePw"))}</button></div>`);
+}
+
+/* sheet helpers */
+let lastFocus=null;
+function openSheet(html){lastFocus=document.activeElement;$("sheet").innerHTML=html;$("sheetbg").hidden=false;S.armed=null}
+function closeSheet(){$("sheetbg").hidden=true;$("sheet").innerHTML="";S.armed=null;if(lastFocus&&lastFocus.focus)try{lastFocus.focus({preventScroll:true})}catch(e){}}
+
+/* ================= events ================= */
+document.addEventListener("submit",ev=>{if(ev.target.id==="loginForm"){ev.preventDefault();doLogin()}});
+document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&!$("sheetbg").hidden)closeSheet()});
+$("sheetbg").addEventListener("click",ev=>{if(ev.target.id==="sheetbg")closeSheet()});
+document.addEventListener("click",async ev=>{
+  const b=ev.target.closest("button");if(!b)return;const d=b.dataset;
+  if(d.lang){S.lang=d.lang;store("cd.lang",S.lang);S.me?render():(configured?viewLogin():viewNotConfigured());return}
+  if("close" in d){closeSheet();return}
+  if(d.tab){S.tab=d.tab;S.armed=null;store("cd.tab",S.tab);render();window.scrollTo(0,0);if(S.tab==="voters")loadVoters(true);return}
+  if(b.id==="acct"){openAccount();return}
+  if(b.id==="ac-out"){await S.sb.auth.signOut();S.me=null;closeSheet();viewLogin();return}
+  if(b.id==="ac-save"){const pw=$("ac-pw").value;const {error}=await S.sb.auth.updateUser({password:pw});if(error){$("ac-err").innerHTML=`<div class="note bad">${esc(errText(error))}</div>`;return}closeSheet();toast(t("pwChanged"));return}
+  // dashboard
+  if(d.dward){S.dashWard=d.dward;render();window.scrollTo(0,0);refreshSummarySoon();return}
+  if(b.id==="dash-back"){S.dashWard=null;render();refreshSummarySoon();return}
+  // voters
+  if(d.vfilter){S.op=S.op===d.vfilter?"":d.vfilter;loadVoters(true);return}
+  if(d.vop){setOpinion(d.vop,d.op);return}
+  if(d.vedit){openVoter(S.voters.find(v=>v.id===d.vedit));return}
+  if(b.id==="v-add"){openVoter(null);return}
+  if(b.id==="v-more"){loadVoters(false);return}
+  if(b.id==="v-export"){exportCsv();return}
+  if(b.id==="v-import"){openImport();return}
+  if(b.id==="im-go"){runImport();return}
+  if(b.id==="vf-save"){saveVoter(d.id);return}
+  if(b.id==="vf-del"){deleteVoter(d.id,b);return}
+  if(d.pick){const box=b.parentElement;const was=b.getAttribute("aria-pressed")==="true";box.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false"));if(!was)b.setAttribute("aria-pressed","true");return}
+  if(d.multi){b.setAttribute("aria-pressed",String(b.getAttribute("aria-pressed")!=="true"));return}
+  // team
+  if(b.id==="w-add"||b.id==="w-add2"){openWard(null);return}
+  if(d.wedit){openWard(wardById(d.wedit));return}
+  if(b.id==="wf-save"){saveWard(d.id);return}
+  if(d.wdel){if(S.armed!=="w:"+d.wdel){S.armed="w:"+d.wdel;render();return}S.armed=null;const {error}=await S.sb.from("wards").delete().eq("id",d.wdel);if(error){toast(errText(error));render();return}S.wards=S.wards.filter(w=>w.id!==d.wdel);if(S.vWard===d.wdel)S.vWard="";render();return}
+  if(d.addm){openMember(d.addm,d.w,null);return}
+  if(d.medit){const m=memberById(d.medit);openMember(m.role,m.ward_id,m);return}
+  if(b.id==="mf-gen"){$("mf-pw").value=genPw();return}
+  if(b.id==="mf-save"){saveMember(b);return}
+  if(d.mpw){openResetPw(memberById(d.mpw));return}
+  if(b.id==="rp-gen"){$("rp-pw").value=genPw();return}
+  if(b.id==="rp-save"){saveResetPw(d.id);return}
+  if(d.mrm){if(S.armed!=="m:"+d.mrm){S.armed="m:"+d.mrm;render();return}S.armed=null;setActive(d.mrm,false);return}
+  if(d.mrestore){setActive(d.mrestore,true);return}
+  // issues
+  if(d.issave){const id=d.issave;const body={en:$("is-en-"+id).value.trim(),kn:$("is-kn-"+id).value.trim()};if(!body.en&&!body.kn)return;if(!body.en)body.en=body.kn;const {error}=await S.sb.from("issues").update(body).eq("id",id);if(error){toast(errText(error));return}Object.assign(S.issues.find(i=>i.id===id),body);toast(t("saved"));return}
+  if(d.isdel){if(S.armed!=="i:"+d.isdel){S.armed="i:"+d.isdel;render();return}S.armed=null;const {error}=await S.sb.from("issues").delete().eq("id",d.isdel);if(error){toast(errText(error));return}S.issues=S.issues.filter(i=>i.id!==d.isdel);render();return}
+  if(b.id==="is-add"){const kn=$("is-new-kn").value.trim(),en=$("is-new-en").value.trim()||kn;if(!en)return;const {data,error}=await S.sb.from("issues").insert({en,kn,sort:(S.issues.at(-1)?.sort||0)+1}).select().single();if(error){toast(errText(error));return}S.issues.push(data);render();return}
+});
+let qT;
+document.addEventListener("input",ev=>{
+  const el=ev.target;
+  if(el.id==="v-q"){S.q=el.value;clearTimeout(qT);qT=setTimeout(()=>loadVoters(true),350)}
+});
+document.addEventListener("change",ev=>{
+  const el=ev.target;
+  if(el.id==="v-ward"){S.vWard=el.value;loadVoters(true)}
+  else if(el.id==="v-sort"){S.sort=el.value;loadVoters(true)}
+  else if(el.id==="im-file"&&el.files[0])readImport(el.files[0]);
+});
+
+/* Android back button: close a sheet, then return to the dashboard, then leave the app */
+window.appBack=function(){
+  if(!$("sheetbg").hidden){closeSheet();return true}
+  if(S.me&&S.tab!=="dashboard"){S.tab="dashboard";render();window.scrollTo(0,0);return true}
+  if(S.me&&S.dashWard&&isMla()){S.dashWard=null;render();refreshSummarySoon();return true}
+  return false;
+};
+
+/* ================= start ================= */
+(async()=>{
+  if(!configured||!window.supabase){viewNotConfigured();return}
+  S.sb=window.supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+  const {data:{session}}=await S.sb.auth.getSession();
+  if(session)await afterLogin();else viewLogin();
+})();
+</script>
+</body>
+</html>
