@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#5a3ea6">
+<meta name="theme-color" content="#4a0d0d">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -15,8 +15,8 @@
 <style>
 /* Layout: one-column field app — header, scrolling sheet, fixed bottom tab bar; modal sheets slide from bottom on phones. */
 :root{
-  --bg:#f5f3f8; --surface:#ffffff; --sunk:#ece8f2; --line:#dcd6e6;
-  --fg:#1d1a24; --muted:#625c70; --accent:#5a3ea6; --accent-fg:#ffffff; --accent-soft:#e9e2f8;
+  --bg:#f6f3f2; --surface:#ffffff; --sunk:#efe8e6; --line:#e2d7d4;
+  --fg:#1f1716; --muted:#6b5e5b; --accent:#8b1c1c; --accent-fg:#ffffff; --accent-soft:#f6e1df; --brand-deep:#4a0d0d;
   --ok:#1f7a4d; --ok-soft:#dcf1e5; --bad:#b3261e; --bad-soft:#fadcd9; --warn:#9a5b00; --warn-soft:#fbecd2;
   /* opinion (diverging: my side ↔ opposite, gray midpoint) */
   --my:#1f8a4c; --neu:#e08a00; --opp:#d0342c; --unk:#e3dfeb; --on-my:#ffffff; --on-neu:#2a1800; --on-opp:#ffffff;
@@ -26,8 +26,8 @@
   --r:10px; color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root{
-  --bg:#141219; --surface:#1d1a25; --sunk:#25212f; --line:#363044;
-  --fg:#efebf6; --muted:#a69fb6; --accent:#a98cf2; --accent-fg:#160f28; --accent-soft:#2e2545;
+  --bg:#141011; --surface:#1d1718; --sunk:#281f20; --line:#3a2d2e;
+  --fg:#f3ecea; --muted:#b3a4a1; --accent:#f08a80; --accent-fg:#2a0707; --accent-soft:#3a1d1c; --brand-deep:#2a0707;
   --ok:#6fd39c; --ok-soft:#173326; --bad:#ff8a80; --bad-soft:#3d1a18; --warn:#f0b75c; --warn-soft:#3a2b12;
   --my:#2fa463; --neu:#b8860b; --opp:#e04558; --unk:#2f2a3b; --on-my:#06140c; --on-neu:#1a1100; --on-opp:#1a0508; color-scheme:dark}}
 *{box-sizing:border-box}
@@ -49,6 +49,12 @@ header.top{display:flex;align-items:center;gap:10px;padding-block:12px;border-bo
 .langs{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;flex:none}
 .langs button{border:0;background:none;padding:5px 10px;cursor:pointer;font-size:.82rem;color:var(--muted)}
 .langs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
+.logo{width:40px;height:40px;border-radius:50%;flex:none;display:block;box-shadow:0 0 0 2px var(--surface),0 0 0 3px var(--line)}
+.party{display:block;color:var(--accent);font-weight:700;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
+.login-hero{background:radial-gradient(120% 90% at 50% 0%,#a32020 0%,var(--brand-deep) 70%);border-radius:16px;padding:28px 20px 22px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;color:#fff}
+.login-hero img{width:150px;height:150px;border-radius:50%;box-shadow:0 10px 30px rgb(0 0 0 / .45)}
+.login-hero h2{color:#fff;font-size:1.35rem}
+.login-hero .pk{font-family:var(--display);font-size:1.05rem;color:#ffd9d4}
 .acct{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;flex:none;font-size:.85rem}
 
 main{display:flex;flex-direction:column;gap:16px;padding-block:18px}
@@ -197,7 +203,7 @@ nav.tabs button[aria-current="page"]{color:var(--accent);font-weight:600}
 "use strict";
 /* ================= strings ================= */
 const T={
-en:{app:"Saundatti Constituency Survey",
+en:{app:"Saundatti Constituency Survey",party:"Saundatti Youth Party",
  polling_tab:"Polling day",notices:"Notice board",postNotice:"Post notice",noticePh:"Write a message for your team…",everyone:"Everyone",noNotices:"No notices yet.",posted:"Posted",
  turnout:"Turnout",votedN:"voted",markVoted:"Mark voted",undoVoted:"Undo",hasVoted:"Voted",serialSearch:"Serial no. on the roll",find:"Find",notFound:"No voter with that serial number in this booth.",
  supNotVoted:"Supporters who have not voted yet",allVotedSup:"All supporters in this booth have voted.",pollingHelp:"Booth agents: type the serial number from the voter slip and mark the voter as voted.",chooseBooth:"Choose a booth",
@@ -205,7 +211,7 @@ en:{app:"Saundatti Constituency Survey",
  topWorkers:"Top workers",weakBooths:"Lowest coverage booths",shareWa:"Share on WhatsApp",shareSlip:"Share voter slip",call:"Call",history:"History",noHistory:"No changes yet.",
  backup:"Backup",backupHelp:"Download a full copy of all data. Do this every week and keep the file safe.",downloadBackup:"Download full backup",backupDone:"Backup saved",backupDue:"Weekly backup is due. Go to Team → Backup.",lastBackup:"Last backup",never:"never",
  offlineQ:"changes saved on this phone — they will be sent when internet returns",offlineList:"Offline: showing the last saved list",syncing:"Sending saved changes…",synced:"All changes sent",saveTarget:"Save target",
- slipTitle:"Saundatti Constituency — Voter slip",
+ slipTitle:"Saundatti Youth Party — Voter slip",
  booth:"Booth",booths:"Booths",allBooths:"All booths",lane:"Lane / area",allLanes:"All lanes",serial:"Sl.",sortRoll:"Roll order",houseN:"House",inHouse:"voters in this house",markAll:"Mark all",
  byBooth:"Booth-wise opinion",byLane:"Lane-wise opinion",tapBooth:"Tap a booth to see its lanes.",backWard:"Back to ward",polling:"Polling station",rollCount:"Roll total",
  rel_father:"Father",rel_husband:"Husband",rel_mother:"Mother",rel_other:"Relative",moveTo:"Move to ward",moved:"Booth moved",noBooth:"No booth",
@@ -236,7 +242,7 @@ en:{app:"Saundatti Constituency Survey",
  E_WARD_IN_USE:"This ward still has people or voters. Move or remove them first.",E_NET:"No connection. Check your internet and try again.",E_GENERIC:"Something went wrong. Try again.",
  notConfigured:"App not set up yet",notConfiguredB:"Open config.js and paste your Supabase project URL and key, then reload this page.",
  privacy:"Voter details are private campaign data. Do not share screenshots outside the team."},
-kn:{app:"ಸವದತ್ತಿ ಕ್ಷೇತ್ರ ಸಮೀಕ್ಷೆ",
+kn:{app:"ಸವದತ್ತಿ ಕ್ಷೇತ್ರ ಸಮೀಕ್ಷೆ",party:"ಸವದತ್ತಿ ಯುವ ಪಕ್ಷ",
  polling_tab:"ಮತದಾನ ದಿನ",notices:"ಸೂಚನಾ ಫಲಕ",postNotice:"ಸೂಚನೆ ಹಾಕಿ",noticePh:"ತಂಡಕ್ಕೆ ಸಂದೇಶ ಬರೆಯಿರಿ…",everyone:"ಎಲ್ಲರಿಗೂ",noNotices:"ಇನ್ನೂ ಸೂಚನೆಗಳಿಲ್ಲ.",posted:"ಹಾಕಲಾಗಿದೆ",
  turnout:"ಮತದಾನ ಪ್ರಮಾಣ",votedN:"ಮತ ಚಲಾಯಿಸಿದ್ದಾರೆ",markVoted:"ಮತ ಚಲಾಯಿಸಿದ್ದಾರೆ ಎಂದು ಗುರುತಿಸಿ",undoVoted:"ರದ್ದು",hasVoted:"ಮತ ಹಾಕಿದ್ದಾರೆ",serialSearch:"ಪಟ್ಟಿಯ ಕ್ರಮ ಸಂಖ್ಯೆ",find:"ಹುಡುಕಿ",notFound:"ಈ ಮತಗಟ್ಟೆಯಲ್ಲಿ ಆ ಕ್ರಮ ಸಂಖ್ಯೆಯ ಮತದಾರರಿಲ್ಲ.",
  supNotVoted:"ಇನ್ನೂ ಮತ ಹಾಕದ ಬೆಂಬಲಿಗರು",allVotedSup:"ಈ ಮತಗಟ್ಟೆಯ ಎಲ್ಲಾ ಬೆಂಬಲಿಗರು ಮತ ಹಾಕಿದ್ದಾರೆ.",pollingHelp:"ಮತಗಟ್ಟೆ ಏಜೆಂಟರು: ಚೀಟಿಯಲ್ಲಿನ ಕ್ರಮ ಸಂಖ್ಯೆ ಬರೆದು ಮತ ಹಾಕಿದ್ದಾರೆ ಎಂದು ಗುರುತಿಸಿ.",chooseBooth:"ಮತಗಟ್ಟೆ ಆಯ್ಕೆಮಾಡಿ",
@@ -244,7 +250,7 @@ kn:{app:"ಸವದತ್ತಿ ಕ್ಷೇತ್ರ ಸಮೀಕ್ಷೆ",
  topWorkers:"ಉತ್ತಮ ಕಾರ್ಯಕರ್ತರು",weakBooths:"ಕಡಿಮೆ ತಲುಪಿದ ಮತಗಟ್ಟೆಗಳು",shareWa:"ವಾಟ್ಸಾಪ್‌ನಲ್ಲಿ ಹಂಚಿ",shareSlip:"ಮತದಾರರ ಚೀಟಿ ಹಂಚಿ",call:"ಕರೆ",history:"ಬದಲಾವಣೆ ಇತಿಹಾಸ",noHistory:"ಇನ್ನೂ ಬದಲಾವಣೆಗಳಿಲ್ಲ.",
  backup:"ಬ್ಯಾಕಪ್",backupHelp:"ಎಲ್ಲಾ ಮಾಹಿತಿಯ ಪೂರ್ಣ ಪ್ರತಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ. ಪ್ರತಿ ವಾರ ಮಾಡಿ, ಫೈಲ್ ಸುರಕ್ಷಿತವಾಗಿಡಿ.",downloadBackup:"ಪೂರ್ಣ ಬ್ಯಾಕಪ್ ಡೌನ್‌ಲೋಡ್",backupDone:"ಬ್ಯಾಕಪ್ ಉಳಿಸಲಾಗಿದೆ",backupDue:"ವಾರದ ಬ್ಯಾಕಪ್ ಬಾಕಿ ಇದೆ. ತಂಡ → ಬ್ಯಾಕಪ್‌ಗೆ ಹೋಗಿ.",lastBackup:"ಕೊನೆಯ ಬ್ಯಾಕಪ್",never:"ಎಂದೂ ಇಲ್ಲ",
  offlineQ:"ಬದಲಾವಣೆಗಳು ಫೋನ್‌ನಲ್ಲಿ ಉಳಿದಿವೆ — ಇಂಟರ್ನೆಟ್ ಬಂದಾಗ ಕಳುಹಿಸಲಾಗುತ್ತದೆ",offlineList:"ಇಂಟರ್ನೆಟ್ ಇಲ್ಲ: ಕೊನೆಯ ಉಳಿಸಿದ ಪಟ್ಟಿ",syncing:"ಉಳಿಸಿದ ಬದಲಾವಣೆಗಳನ್ನು ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ…",synced:"ಎಲ್ಲಾ ಬದಲಾವಣೆಗಳು ಕಳುಹಿಸಲಾಗಿದೆ",saveTarget:"ಗುರಿ ಉಳಿಸಿ",
- slipTitle:"ಸವದತ್ತಿ ಕ್ಷೇತ್ರ — ಮತದಾರರ ಚೀಟಿ",
+ slipTitle:"ಸವದತ್ತಿ ಯುವ ಪಕ್ಷ — ಮತದಾರರ ಚೀಟಿ",
  booth:"ಮತಗಟ್ಟೆ",booths:"ಮತಗಟ್ಟೆಗಳು",allBooths:"ಎಲ್ಲಾ ಮತಗಟ್ಟೆಗಳು",lane:"ಓಣಿ / ಪ್ರದೇಶ",allLanes:"ಎಲ್ಲಾ ಓಣಿಗಳು",serial:"ಕ್ರ.ಸಂ.",sortRoll:"ಪಟ್ಟಿ ಕ್ರಮ",houseN:"ಮನೆ",inHouse:"ಈ ಮನೆಯ ಮತದಾರರು",markAll:"ಎಲ್ಲರಿಗೂ",
  byBooth:"ಮತಗಟ್ಟೆವಾರು ಅಭಿಪ್ರಾಯ",byLane:"ಓಣಿವಾರು ಅಭಿಪ್ರಾಯ",tapBooth:"ಓಣಿಗಳನ್ನು ನೋಡಲು ಮತಗಟ್ಟೆ ಮೇಲೆ ಒತ್ತಿ.",backWard:"ವಾರ್ಡ್‌ಗೆ ಹಿಂತಿರುಗಿ",polling:"ಮತಗಟ್ಟೆ ಸ್ಥಳ",rollCount:"ಪಟ್ಟಿಯ ಒಟ್ಟು",
  rel_father:"ತಂದೆ",rel_husband:"ಪತಿ",rel_mother:"ತಾಯಿ",rel_other:"ಸಂಬಂಧಿ",moveTo:"ಈ ವಾರ್ಡ್‌ಗೆ ಸ್ಥಳಾಂತರಿಸಿ",moved:"ಮತಗಟ್ಟೆ ಸ್ಥಳಾಂತರಿಸಲಾಗಿದೆ",noBooth:"ಮತಗಟ್ಟೆ ಇಲ್ಲ",
@@ -337,8 +343,8 @@ function viewLogin(msg){
   $("tabbar").hidden=true;
   $("app").innerHTML=`<form class="login" id="loginForm" autocomplete="on">
    ${langToggle()}
-   <div class="mark" aria-hidden="true"></div>
-   <div><h2>${esc(t("app"))}</h2><p class="sub">${esc(t("loginTitle"))}</p></div>
+   <div class="login-hero"><img src="logo-192.png" alt="${esc(t("party"))}"><div class="pk">${esc(t("party"))}</div><h2>${esc(t("app"))}</h2></div>
+   <p class="sub" style="margin:0">${esc(t("loginTitle"))}</p>
    ${msg?`<div class="note bad">${esc(msg)}</div>`:""}
    <label class="f">${esc(t("loginId"))}<input type="text" id="li-id" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username" required></label>
    <label class="f">${esc(t("password"))}<input type="password" id="li-pw" autocomplete="current-password" required></label>
@@ -418,7 +424,7 @@ function render(){
   const sub=t(S.me.role)+(S.me.ward_id?" · "+wardLabel(wardById(S.me.ward_id)):" · "+cname());
   const initials=(S.me.full_name||"?").trim().split(/\s+/).map(x=>x[0]).slice(0,2).join("").toUpperCase();
   const focusId=document.activeElement?.id;const caret=document.activeElement?.selectionStart;
-  $("app").innerHTML=`<header class="top"><div class="brand"><div class="mark" aria-hidden="true"></div><div style="min-width:0"><h1>${esc(t("app"))}</h1><small>${esc(S.me.full_name)} · ${esc(sub)}</small></div></div>
+  $("app").innerHTML=`<header class="top"><div class="brand"><img class="logo" src="logo-96.png" alt="${esc(t("party"))}"><div style="min-width:0"><span class="party">${esc(t("party"))}</span><h1>${esc(t("app"))}</h1><small>${esc(S.me.full_name)} · ${esc(sub)}</small></div></div>
    <div class="langs" role="group" aria-label="Language"><button type="button" data-lang="kn" aria-pressed="${S.lang==="kn"}">ಕನ್ನಡ</button><button type="button" data-lang="en" aria-pressed="${S.lang==="en"}">EN</button></div>
    <button class="acct" type="button" id="acct" aria-label="${esc(t("account"))}">${esc(initials)}</button></header>
    <main>${queueBanner()}${({dashboard:vDashboard,voters:vVoters,polling:vPolling,team:vTeam})[S.tab]()}</main>`;
@@ -836,7 +842,7 @@ async function saveMember(btn){
 }
 function showCreds(name,login,pw){
   const link=location.origin+location.pathname;
-  const txt=`${t("app")}\n${t("appLink")}: ${link}\n${t("loginId")}: ${login}\n${t("password")}: ${pw}`;
+  const txt=`${t("party")} — ${t("app")}\n${t("appLink")}: ${link}\n${t("loginId")}: ${login}\n${t("password")}: ${pw}`;
   openSheet(`<div class="sheet-head"><h3>${esc(t("created"))}</h3><button class="btn ghost sm" type="button" data-close>✕</button></div>
    <p style="margin:0">${esc(t("shareCreds"))} <b>${esc(name)}</b></p><div class="cred" id="cred-txt">${esc(txt)}</div>
    <div class="row"><span style="flex:1 1 0"></span><button class="btn fit" type="button" id="cred-copy">${esc(t("copy"))}</button><button class="btn primary fit" type="button" data-close>${esc(t("done"))}</button></div>`);
@@ -944,7 +950,7 @@ function shareReport(){
   const rows=S.daily.map(r=>({m:memberById(r.changed_by),n:Number(r.contacted)||0,v:Number(r.voted_marked)||0}));
   const wid=S.dashWard||(isMla()?null:S.me.ward_id);
   const s=sumFor(wid);
-  const lines=[`*${t("app")} — ${t("dailyReport")}*`,new Date().toLocaleDateString(S.lang==="kn"?"kn-IN":"en-IN",{day:"numeric",month:"long",year:"numeric"}),wid?wardLabel(wardById(wid)):cname(),"",
+  const lines=[`*${t("party")}*`,`${t("app")} — ${t("dailyReport")}`,new Date().toLocaleDateString(S.lang==="kn"?"kn-IN":"en-IN",{day:"numeric",month:"long",year:"numeric"}),wid?wardLabel(wardById(wid)):cname(),"",
     `${t("contactedToday")}: ${rows.reduce((a,r)=>a+r.n,0)}`,`${t("votedToday")}: ${rows.reduce((a,r)=>a+r.v,0)}`,
     `${t("covered")}: ${coverage(s)}% (${s.total-s.unknown}/${s.total})`,`${t("my_side")} ${pct(s.my_side,s.total)}% · ${t("neutral")} ${pct(s.neutral,s.total)}% · ${t("opposite")} ${pct(s.opposite,s.total)}%`,"",
     `${t("topWorkers")}:`,...rows.filter(r=>r.m&&r.n).sort((a,b)=>b.n-a.n).slice(0,5).map(r=>`• ${r.m.full_name}: ${r.n}`)];
