@@ -127,6 +127,9 @@ textarea{min-height:70px;resize:vertical}
 .vlist{display:flex;flex-direction:column;margin:0;padding:0;list-style:none}
 .voter{display:flex;gap:10px;align-items:center;padding-block:10px;border-top:1px solid var(--line);flex-wrap:wrap}
 .voter:first-child{border-top:0}
+.house{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 12px;margin-top:6px;background:var(--sunk);border-radius:8px;list-style:none}
+.house .grow{flex:1 1 160px;min-width:0}
+.house .opseg button{padding:5px 8px}
 .v-main{flex:1 1 180px;min-width:0;background:none;border:0;padding:0;text-align:left;cursor:pointer;color:inherit}
 .v-name{font-weight:600;display:block;overflow-wrap:anywhere}
 .v-main:hover .v-name{color:var(--accent)}
@@ -194,7 +197,12 @@ nav.tabs button[aria-current="page"]{color:var(--accent);font-weight:600}
 "use strict";
 /* ================= strings ================= */
 const T={
-en:{app:"Campaign Desk",dashboard:"Dashboard",voters:"Voters",team:"Team",
+en:{app:"Campaign Desk",
+ booth:"Booth",booths:"Booths",allBooths:"All booths",lane:"Lane / area",allLanes:"All lanes",serial:"Sl.",sortRoll:"Roll order",houseN:"House",inHouse:"voters in this house",markAll:"Mark all",
+ byBooth:"Booth-wise opinion",byLane:"Lane-wise opinion",tapBooth:"Tap a booth to see its lanes.",backWard:"Back to ward",polling:"Polling station",rollCount:"Roll total",
+ rel_father:"Father",rel_husband:"Husband",rel_mother:"Mother",rel_other:"Relative",moveTo:"Move to ward",moved:"Booth moved",noBooth:"No booth",
+ importRoll:"Load electoral roll file",importRollHelp:"Choose the roll file prepared by Claude (.json). Booths and places are created automatically. Opinions already marked are kept.",
+ rollReady:"booths and voters ready to load",loading:"Loading…",rollDone:"Electoral roll loaded",boothsN:"booths",dashboard:"Dashboard",voters:"Voters",team:"Team",
  loginTitle:"Sign in",loginId:"Login ID",password:"Password",signIn:"Sign in",badLogin:"Wrong login ID or password.",inactive:"This login has been switched off. Contact your ward leader or the MLA.",
  signOut:"Sign out",changePw:"Change my password",newPw:"New password",pwChanged:"Password changed",account:"Your account",
  mla:"MLA",ward_leader:"Ward leader",worker:"Party worker",ward:"Ward",allWards:"All wards",constituency:"Constituency",
@@ -220,7 +228,12 @@ en:{app:"Campaign Desk",dashboard:"Dashboard",voters:"Voters",team:"Team",
  E_WARD_IN_USE:"This ward still has people or voters. Move or remove them first.",E_NET:"No connection. Check your internet and try again.",E_GENERIC:"Something went wrong. Try again.",
  notConfigured:"App not set up yet",notConfiguredB:"Open config.js and paste your Supabase project URL and key, then reload this page.",
  privacy:"Voter details are private campaign data. Do not share screenshots outside the team."},
-kn:{app:"ಪ್ರಚಾರ ಕೇಂದ್ರ",dashboard:"ಸಾರಾಂಶ",voters:"ಮತದಾರರು",team:"ತಂಡ",
+kn:{app:"ಪ್ರಚಾರ ಕೇಂದ್ರ",
+ booth:"ಮತಗಟ್ಟೆ",booths:"ಮತಗಟ್ಟೆಗಳು",allBooths:"ಎಲ್ಲಾ ಮತಗಟ್ಟೆಗಳು",lane:"ಓಣಿ / ಪ್ರದೇಶ",allLanes:"ಎಲ್ಲಾ ಓಣಿಗಳು",serial:"ಕ್ರ.ಸಂ.",sortRoll:"ಪಟ್ಟಿ ಕ್ರಮ",houseN:"ಮನೆ",inHouse:"ಈ ಮನೆಯ ಮತದಾರರು",markAll:"ಎಲ್ಲರಿಗೂ",
+ byBooth:"ಮತಗಟ್ಟೆವಾರು ಅಭಿಪ್ರಾಯ",byLane:"ಓಣಿವಾರು ಅಭಿಪ್ರಾಯ",tapBooth:"ಓಣಿಗಳನ್ನು ನೋಡಲು ಮತಗಟ್ಟೆ ಮೇಲೆ ಒತ್ತಿ.",backWard:"ವಾರ್ಡ್‌ಗೆ ಹಿಂತಿರುಗಿ",polling:"ಮತಗಟ್ಟೆ ಸ್ಥಳ",rollCount:"ಪಟ್ಟಿಯ ಒಟ್ಟು",
+ rel_father:"ತಂದೆ",rel_husband:"ಪತಿ",rel_mother:"ತಾಯಿ",rel_other:"ಸಂಬಂಧಿ",moveTo:"ಈ ವಾರ್ಡ್‌ಗೆ ಸ್ಥಳಾಂತರಿಸಿ",moved:"ಮತಗಟ್ಟೆ ಸ್ಥಳಾಂತರಿಸಲಾಗಿದೆ",noBooth:"ಮತಗಟ್ಟೆ ಇಲ್ಲ",
+ importRoll:"ಮತದಾರರ ಪಟ್ಟಿ ಫೈಲ್ ಲೋಡ್ ಮಾಡಿ",importRollHelp:"Claude ಸಿದ್ಧಪಡಿಸಿದ ಪಟ್ಟಿ ಫೈಲ್ (.json) ಆಯ್ಕೆಮಾಡಿ. ಮತಗಟ್ಟೆ ಮತ್ತು ಸ್ಥಳಗಳು ತಾನಾಗಿ ರಚನೆಯಾಗುತ್ತವೆ. ಈಗಾಗಲೇ ಗುರುತಿಸಿದ ಅಭಿಪ್ರಾಯಗಳು ಉಳಿಯುತ್ತವೆ.",
+ rollReady:"ಮತಗಟ್ಟೆಗಳು ಮತ್ತು ಮತದಾರರು ಲೋಡ್‌ಗೆ ಸಿದ್ಧ",loading:"ಲೋಡ್ ಆಗುತ್ತಿದೆ…",rollDone:"ಮತದಾರರ ಪಟ್ಟಿ ಲೋಡ್ ಆಯಿತು",boothsN:"ಮತಗಟ್ಟೆಗಳು",dashboard:"ಸಾರಾಂಶ",voters:"ಮತದಾರರು",team:"ತಂಡ",
  loginTitle:"ಲಾಗಿನ್",loginId:"ಲಾಗಿನ್ ಐಡಿ",password:"ಪಾಸ್‌ವರ್ಡ್",signIn:"ಲಾಗಿನ್ ಮಾಡಿ",badLogin:"ಲಾಗಿನ್ ಐಡಿ ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್ ತಪ್ಪಾಗಿದೆ.",inactive:"ಈ ಲಾಗಿನ್ ನಿಲ್ಲಿಸಲಾಗಿದೆ. ನಿಮ್ಮ ವಾರ್ಡ್ ಮುಖಂಡರು ಅಥವಾ ಶಾಸಕರನ್ನು ಸಂಪರ್ಕಿಸಿ.",
  signOut:"ಲಾಗ್ ಔಟ್",changePw:"ನನ್ನ ಪಾಸ್‌ವರ್ಡ್ ಬದಲಿಸಿ",newPw:"ಹೊಸ ಪಾಸ್‌ವರ್ಡ್",pwChanged:"ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿತು",account:"ನಿಮ್ಮ ಖಾತೆ",
  mla:"ಶಾಸಕರು",ward_leader:"ವಾರ್ಡ್ ಮುಖಂಡ",worker:"ಕಾರ್ಯಕರ್ತ",ward:"ವಾರ್ಡ್",allWards:"ಎಲ್ಲಾ ವಾರ್ಡ್‌ಗಳು",constituency:"ಕ್ಷೇತ್ರ",
@@ -260,7 +273,7 @@ const ICONS={
 /* ================= state & utils ================= */
 const CFG=window.CAMPAIGN_CONFIG||{};
 const S={lang:"kn",tab:"dashboard",sb:null,me:null,wards:[],members:[],issues:[],summary:[],issueSum:[],activity:[],
- dashWard:null,vWard:"",q:"",op:"",sort:"name",voters:[],vCount:0,vLoading:false,armed:null,busy:false};
+ booths:[],boothSum:[],secSum:[],dashBooth:null,vBooth:"",vSec:"",dashWard:null,vWard:"",q:"",op:"",sort:"roll",voters:[],vCount:0,vLoading:false,armed:null,busy:false};
 try{const l=localStorage.getItem("cd.lang");if(l==="en"||l==="kn")S.lang=l;const tb=localStorage.getItem("cd.tab");if(tb&&ICONS[tb])S.tab=tb}catch(e){}
 const t=k=>(T[S.lang][k]??T.en[k]??k);
 const L=o=>o?((S.lang==="kn"?(o.kn||o.en):(o.en||o.kn))||""):"";
@@ -283,6 +296,11 @@ function errText(e){
 const wardById=id=>S.wards.find(w=>w.id===id);
 const wardLabel=w=>w?`${t("ward")} ${w.number?w.number+" · ":""}${w.name}`:"";
 const memberById=id=>S.members.find(m=>m.user_id===id);
+const boothById=id=>S.booths.find(b=>b.id===id);
+const boothLabel=b=>b?`${t("booth")} ${b.part_no} · ${b.place}`:"";
+const boothsIn=wid=>S.booths.filter(b=>!wid||b.ward_id===wid);
+const secName=(b,no)=>{const x=(b?.sections||[]).find(s=>s.no===no);return x?String(x.name).replace(/\s*H\.?\s*No\..*$/i,"").trim():(no?`${t("lane")} ${no}`:"")};
+function sumRows(rows){const o={total:0,my_side:0,neutral:0,opposite:0,unknown:0};for(const r of rows)for(const k in o)o[k]+=Number(r[k])||0;return o}
 const isMla=()=>S.me?.role==="mla";
 const isLeader=()=>S.me?.role==="ward_leader";
 const canManageVoters=()=>isMla()||isLeader();
@@ -332,22 +350,26 @@ async function afterLogin(){
 }
 async function loadAll(){
   const scope=isMla()?null:S.me.ward_id;
-  const [w,m,i,s,is,a]=await Promise.all([
+  const [w,m,i,s,is,a,bo,bs]=await Promise.all([
     S.sb.from("wards").select("*"),
     S.sb.from("members").select("*"),
     S.sb.from("issues").select("*").order("sort"),
     S.sb.rpc("ward_summary"),
     S.sb.rpc("issue_summary",{p_ward:S.dashWard||scope}),
-    S.sb.rpc("team_activity",{p_ward:scope})
+    S.sb.rpc("team_activity",{p_ward:scope}),
+    S.sb.from("booths").select("*").order("part_no"),
+    S.sb.rpc("booth_summary",{p_ward:scope})
   ]);
-  for(const r of [w,m,i,s,is,a])if(r.error){toast(errText(r.error));break}
+  for(const r of [w,m,i,s,is,a,bo,bs])if(r.error){toast(errText(r.error));break}
+  S.booths=bo.data||[];S.boothSum=bs.data||[];
   S.wards=w.data||[];S.members=m.data||[];S.issues=i.data||[];S.summary=s.data||[];S.issueSum=is.data||[];S.activity=a.data||[];
   if(isMla()&&!S.vWard&&S.wards.length)S.vWard=sortedWards()[0].id;
 }
 let sumT;
 function refreshSummarySoon(){clearTimeout(sumT);sumT=setTimeout(async()=>{
-  const [s,is,a]=await Promise.all([S.sb.rpc("ward_summary"),S.sb.rpc("issue_summary",{p_ward:S.dashWard||(isMla()?null:S.me.ward_id)}),S.sb.rpc("team_activity",{p_ward:isMla()?null:S.me.ward_id})]);
-  if(!s.error)S.summary=s.data;if(!is.error)S.issueSum=is.data;if(!a.error)S.activity=a.data;
+  const [s,is,a,bs,ss]=await Promise.all([S.sb.rpc("ward_summary"),S.sb.rpc("issue_summary",{p_ward:S.dashWard||(isMla()?null:S.me.ward_id)}),S.sb.rpc("team_activity",{p_ward:isMla()?null:S.me.ward_id}),
+    S.sb.rpc("booth_summary",{p_ward:isMla()?null:S.me.ward_id}),S.dashBooth?S.sb.rpc("section_summary",{p_booth:S.dashBooth}):Promise.resolve({data:S.secSum})]);
+  if(!s.error)S.summary=s.data;if(!is.error)S.issueSum=is.data;if(!a.error)S.activity=a.data;if(!bs.error)S.boothSum=bs.data;if(!ss.error)S.secSum=ss.data||[];
   if(S.tab!=="voters")render();
 },700)}
 
@@ -391,27 +413,36 @@ function stack(s){
   if(!s.total)return `<div class="stack empty-bar"></div>`;
   return `<div class="stack">${OPS.filter(k=>s[k]>0).map(k=>`<i class="${OPCLS[k]}" style="flex:${s[k]} 1 0" title="${esc(t(k))}: ${num(s[k])} (${pct(s[k],s.total)}%)"></i>`).join("")}</div>`;
 }
+function opRows(items,attr){
+  return `<ul class="wards">${items.map(it=>`<li><button class="wardrow" type="button" ${attr?`data-${attr}="${esc(it.id)}"`:"disabled"}><span class="wname">${esc(it.label)}</span><span class="wtot">${num(it.s.total)}${it.roll?` / ${num(it.roll)}`:""} ${esc(t("votersN"))}</span>${stack(it.s)}<span class="wpct">${it.sub?`<span>${esc(it.sub)}</span>`:""}${["my_side","neutral","opposite"].map(k=>`<span><i class="dot ${OPCLS[k]}"></i>${esc(t(k))} ${pct(it.s[k],it.s.total)}%</span>`).join("")}</span></button></li>`).join("")}</ul>`;
+}
 function vDashboard(){
-  const scopeWard=S.dashWard;
-  const s=sumFor(scopeWard);
-  const w=scopeWard?wardById(scopeWard):null;
-  let out=`<div class="section-head"><div>${isMla()&&scopeWard?`<button class="btn sm ghost" type="button" id="dash-back" style="padding-left:0">← ${esc(t("back"))}</button>`:""}<h2>${esc(w?wardLabel(w):t("constituency")+" · "+cname())}</h2><p class="sub">${esc(t("privacy"))}</p></div></div>
+  const W=S.dashWard,B=S.dashBooth;
+  const w=W?wardById(W):null,bo=B?boothById(B):null;
+  const s=B?sumRows(S.boothSum.filter(r=>r.booth_id===B)):sumFor(W);
+  const back=B?t("backWard"):(isMla()&&W?t("back"):"");
+  let out=`<div class="section-head"><div>${back?`<button class="btn sm ghost" type="button" id="dash-back" style="padding-left:0">← ${esc(back)}</button>`:""}<h2>${esc(bo?boothLabel(bo):(w?wardLabel(w):t("constituency")+" · "+cname()))}</h2><p class="sub">${esc(bo?(bo.polling_station||""):t("privacy"))}</p></div></div>
   <div class="tiles">
    <div class="tile"><span>${esc(t("total"))}</span><b>${num(s.total)}</b><small>${num(s.unknown)} ${esc(t("unknown"))}</small></div>
    ${["my_side","neutral","opposite"].map(k=>`<div class="tile"><span><i class="dot ${OPCLS[k]}"></i>${esc(t(k))}</span><b>${pct(s[k],s.total)}%</b><small>${num(s[k])}</small></div>`).join("")}
   </div>
   <div class="panel"><h3>${esc(t("opinion"))}</h3><div class="donut-wrap">${donut(s)}${legend(s)}</div></div>`;
-  if(isMla()&&!scopeWard){
+  if(isMla()&&!W){
     const ws=sortedWards();
-    out+=`<div class="panel"><div><h3>${esc(t("byWard"))}</h3><p class="sub">${esc(t("tapWard"))}</p></div>${ws.length?`<ul class="wards">${ws.map(wd=>{const x=sumFor(wd.id);return `<li><button class="wardrow" type="button" data-dward="${esc(wd.id)}"><span class="wname">${esc(wardLabel(wd))}</span><span class="wtot">${num(x.total)} ${esc(t("votersN"))}</span>${stack(x)}<span class="wpct">${["my_side","neutral","opposite"].map(k=>`<span><i class="dot ${OPCLS[k]}"></i>${esc(t(k))} ${pct(x[k],x.total)}%</span>`).join("")}</span></button></li>`}).join("")}</ul>`:`<p class="sub" style="margin:0">—</p>`}</div>`;
+    out+=`<div class="panel"><div><h3>${esc(t("byWard"))}</h3><p class="sub">${esc(t("tapWard"))}</p></div>${ws.length?opRows(ws.map(wd=>({id:wd.id,label:wardLabel(wd),s:sumFor(wd.id),sub:boothsIn(wd.id).length?`${boothsIn(wd.id).length} ${t("boothsN")}`:""})),"dward"):`<p class="sub" style="margin:0">—</p>`}</div>`;
+  }else if(W&&!B){
+    const bs=boothsIn(W);
+    if(bs.length)out+=`<div class="panel"><div><h3>${esc(t("byBooth"))}</h3><p class="sub">${esc(t("tapBooth"))}</p></div>${opRows(bs.map(x=>({id:x.id,label:boothLabel(x),s:sumRows(S.boothSum.filter(r=>r.booth_id===x.id)),roll:x.roll_total,sub:x.polling_station})),"dbooth")}</div>`;
+  }else if(B){
+    const rows=[...S.secSum].sort((a,b)=>(a.section_no||0)-(b.section_no||0));
+    if(rows.length)out+=`<div class="panel"><h3>${esc(t("byLane"))}</h3>${opRows(rows.map(r=>({id:r.section_no,label:`${r.section_no||"–"}. ${secName(bo,r.section_no)}`,s:sumRows([r])})),"")}</div>`;
   }
   // issues
   const isum=[...S.issueSum].map(r=>({l:L(S.issues.find(i=>i.id===r.issue_id))||"—",n:Number(r.n)})).sort((a,b)=>b.n-a.n).slice(0,10);
   const maxI=isum[0]?.n||0;
   out+=`<div class="panel"><h3>${esc(t("topIssues"))}</h3>${isum.length?`<div class="bars">${isum.map(r=>`<div class="bar"><span>${esc(r.l)}</span><span class="val">${num(r.n)} · ${pct(r.n,s.total)}%</span><div class="track"><div class="fill" style="width:${pct(r.n,maxI)}%"></div></div></div>`).join("")}</div>`:`<p class="sub" style="margin:0">${esc(t("noIssues"))}</p>`}</div>`;
-  // team activity
-  if(canManageVoters()){
-    const wid=scopeWard||(isMla()?null:S.me.ward_id);
+  if(canManageVoters()&&!B){
+    const wid=W||(isMla()?null:S.me.ward_id);
     const rows=S.activity.map(a=>({m:memberById(a.user_id),a})).filter(x=>x.m&&x.m.active&&(!wid||x.m.ward_id===wid)&&(Number(x.a.voters_added)||Number(x.a.voters_updated))).sort((x,y)=>y.a.voters_updated-x.a.voters_updated).slice(0,15);
     if(rows.length)out+=`<div class="panel"><h3>${esc(t("teamWork"))}</h3><ul class="mlist">${rows.map(x=>`<li class="member"><div class="grow"><div class="t">${esc(x.m.full_name)} <span class="role ${x.m.role}">${esc(t(x.m.role))}</span></div><div class="m">${esc(wardLabel(wardById(x.m.ward_id))||cname())}</div></div><span class="code">${esc(t("added"))} ${num(x.a.voters_added)} · ${esc(t("updated"))} ${num(x.a.voters_updated)}</span></li>`).join("")}</ul></div>`;
   }
@@ -419,42 +450,62 @@ function vDashboard(){
 }
 
 /* ================= voters ================= */
+function relLine(v){return v.relative_name?`${t("rel_"+(v.relation||"other"))}: ${v.relative_name}`:""}
 function vVoters(){
   if(!S.wards.length)return `<div class="panel"><div class="empty"><h3>${esc(t("wards"))}: 0</h3><p style="margin:0">${esc(isMla()?t("addWard"):t("E_WARD_REQUIRED"))}</p>${isMla()?`<button class="btn primary" data-tab="team" type="button">${esc(t("team"))}</button>`:""}</div></div>`;
-  const s=sumFor(S.vWard||null);
+  const bo=S.vBooth?boothById(S.vBooth):null;
+  const s=bo?sumRows(S.boothSum.filter(r=>r.booth_id===bo.id)):sumFor(S.vWard||null);
   const counts={my_side:s.my_side,neutral:s.neutral,opposite:s.opposite,unknown:s.unknown};
-  const list=S.voters.map(v=>{
-    const meta=[v.house_no?"#"+v.house_no:"",[v.age||"",v.gender?(S.lang==="en"?t(v.gender)[0]:t(v.gender)):""].filter(Boolean).join(" "),v.epic_no||"",(!S.vWard&&isMla())?wardLabel(wardById(v.ward_id)):""].filter(Boolean).join(" · ");
-    return `<li class="voter"><button class="v-main" type="button" data-vedit="${esc(v.id)}"><span class="v-name">${esc(v.full_name)}</span><span class="v-meta">${esc(meta)||"&nbsp;"}</span></button>
-     <div class="opseg" role="group" aria-label="${esc(t("opinion"))}">${["my_side","neutral","opposite"].map(o=>`<button type="button" data-vop="${esc(v.id)}" data-op="${o}" aria-pressed="${v.opinion===o}">${esc(t(o))}</button>`).join("")}</div></li>`;
-  }).join("");
-  const filtered=S.q||S.op;
-  return `<div class="section-head"><div><h2>${esc(t("voters"))}</h2><p class="sub">${num(S.vCount)} ${S.voters.length<S.vCount?"· "+num(S.voters.length)+" "+esc(t("shown")):""}</p></div>
+  const grouped=(S.sort==="roll"||S.sort==="house");
+  let lastKey=null;const parts=[];
+  S.voters.forEach((v,i)=>{
+    const key=(v.booth_id||"")+"|"+(v.house_no||"");
+    if(grouped&&v.house_no&&key!==lastKey){
+      let n=0;const ids=[];for(let j=i;j<S.voters.length&&((S.voters[j].booth_id||"")+"|"+(S.voters[j].house_no||""))===key;j++){n++;ids.push(S.voters[j].id)}
+      if(n>1)parts.push(`<li class="house"><div class="grow"><b>${esc(t("houseN"))} ${esc(v.house_no)}</b> <span class="sub">· ${num(n)} ${esc(t("inHouse"))}${!S.vBooth&&v.booth_id?" · "+esc(boothLabel(boothById(v.booth_id))):""}</span></div><div class="opseg" role="group" aria-label="${esc(t("markAll"))}">${["my_side","neutral","opposite"].map(o=>`<button type="button" data-hop="${esc(ids.join(","))}" data-op="${o}" aria-pressed="false">${esc(t(o))}</button>`).join("")}</div></li>`);
+    }
+    lastKey=key;
+    const meta=[v.serial_no?`${t("serial")} ${v.serial_no}`:"",v.house_no?`${t("houseN")} ${v.house_no}`:"",[v.age||"",v.gender?(S.lang==="en"?t(v.gender)[0]:t(v.gender)):""].filter(Boolean).join(" "),v.epic_no||"",(!S.vBooth&&v.booth_id&&!grouped)?boothLabel(boothById(v.booth_id)):""].filter(Boolean).join(" · ");
+    parts.push(`<li class="voter"><button class="v-main" type="button" data-vedit="${esc(v.id)}"><span class="v-name">${esc(v.full_name)}</span><span class="v-meta">${esc(meta)||"&nbsp;"}</span>${v.relative_name?`<span class="v-meta">${esc(relLine(v))}</span>`:""}</button>
+     <div class="opseg" role="group" aria-label="${esc(t("opinion"))}">${["my_side","neutral","opposite"].map(o=>`<button type="button" data-vop="${esc(v.id)}" data-op="${o}" aria-pressed="${v.opinion===o}">${esc(t(o))}</button>`).join("")}</div></li>`);
+  });
+  const filtered=S.q||S.op||S.vSec;
+  const wardForBooths=isMla()?S.vWard:S.me.ward_id;
+  const bopts=boothsIn(wardForBooths);
+  return `<div class="section-head"><div><h2>${esc(t("voters"))}</h2><p class="sub">${num(S.vCount)} ${S.voters.length<S.vCount?"· "+num(S.voters.length)+" "+esc(t("shown")):""}${bo?" · "+esc(bo.polling_station||""):""}</p></div>
    <div class="row" style="flex:0 1 auto;justify-content:flex-end">${canManageVoters()?`<button class="btn fit" type="button" id="v-import">${esc(t("importCsv"))}</button><button class="btn fit" type="button" id="v-export">${esc(t("exportCsv"))}</button>`:""}<button class="btn primary fit" type="button" id="v-add">+ ${esc(t("addVoter"))}</button></div></div>
   <div class="panel">
    <div class="row">
     ${isMla()?`<label class="f">${esc(t("ward"))}<select id="v-ward"><option value="">${esc(t("allWards"))}</option>${sortedWards().map(w=>`<option value="${esc(w.id)}" ${w.id===S.vWard?"selected":""}>${esc(wardLabel(w))}</option>`).join("")}</select></label>`:""}
+    ${bopts.length?`<label class="f">${esc(t("booth"))}<select id="v-booth"><option value="">${esc(t("allBooths"))}</option>${bopts.map(x=>`<option value="${esc(x.id)}" ${x.id===S.vBooth?"selected":""}>${esc(boothLabel(x))}</option>`).join("")}</select></label>`:""}
+    ${bo&&(bo.sections||[]).length?`<label class="f">${esc(t("lane"))}<select id="v-sec"><option value="">${esc(t("allLanes"))}</option>${bo.sections.map(x=>`<option value="${x.no}" ${String(x.no)===String(S.vSec)?"selected":""}>${x.no}. ${esc(secName(bo,x.no))}</option>`).join("")}</select></label>`:""}
+   </div>
+   <div class="row">
     <label class="f" style="flex:2 1 220px">${esc(t("search"))}<input type="search" id="v-q" value="${esc(S.q)}" autocomplete="off"></label>
-    <label class="f" style="flex:0 1 160px">${esc(t("sort"))}<select id="v-sort">${[["name","sortName"],["house","sortHouse"],["recent","sortRecent"]].map(([k,l])=>`<option value="${k}" ${S.sort===k?"selected":""}>${esc(t(l))}</option>`).join("")}</select></label>
+    <label class="f" style="flex:0 1 170px">${esc(t("sort"))}<select id="v-sort">${[["roll","sortRoll"],["name","sortName"],["house","sortHouse"],["recent","sortRecent"]].map(([k,l])=>`<option value="${k}" ${S.sort===k?"selected":""}>${esc(t(l))}</option>`).join("")}</select></label>
    </div>
    <div class="chips">${OPS.map(o=>`<button type="button" class="chip" data-vfilter="${o}" aria-pressed="${S.op===o}"><i class="dot ${OPCLS[o]}"></i> ${esc(t(o))}<span class="n">${num(counts[o])}</span></button>`).join("")}</div>
   </div>
-  <div class="panel">${S.vLoading&&!S.voters.length?`<div class="empty"><div class="spin"></div></div>`:S.voters.length?`<ul class="vlist">${list}</ul>${S.voters.length<S.vCount?`<button class="btn" type="button" id="v-more" ${S.vLoading?"disabled":""}>${esc(t("showMore"))}</button>`:""}`:
+  <div class="panel">${S.vLoading&&!S.voters.length?`<div class="empty"><div class="spin"></div></div>`:S.voters.length?`<ul class="vlist">${parts.join("")}</ul>${S.voters.length<S.vCount?`<button class="btn" type="button" id="v-more" ${S.vLoading?"disabled":""}>${esc(t("showMore"))}</button>`:""}`:
    filtered?`<p class="sub" style="margin:0">${esc(t("noVoters"))}</p>`:`<div class="empty"><h3>${esc(t("noVotersYet"))}</h3><p style="margin:0">${esc(t("noVotersYetB"))}</p></div>`}</div>`;
 }
 function voterQuery(sel,opts){
   let q=S.sb.from("voters").select(sel,opts);
-  if(S.vWard)q=q.eq("ward_id",S.vWard);
+  if(S.vBooth)q=q.eq("booth_id",S.vBooth);else if(S.vWard)q=q.eq("ward_id",S.vWard);
+  if(S.vBooth&&S.vSec)q=q.eq("section_no",Number(S.vSec));
   if(S.op)q=q.eq("opinion",S.op);
   const term=S.q.trim().replace(/[,()%*\\]/g," ").trim();
-  if(term){const p=`%${term}%`;q=q.or(`full_name.ilike.${p},house_no.ilike.${p},epic_no.ilike.${p},phone.ilike.${p}`)}
+  if(term){const p=`%${term}%`;
+    if(/^\d{1,4}$/.test(term))q=q.or(`serial_no.eq.${term},house_no.ilike.${term},house_no.ilike.${term}/%`);
+    else q=q.or(`full_name.ilike.${p},house_no.ilike.${p},epic_no.ilike.${p},phone.ilike.${p},relative_name.ilike.${p}`)}
   return q;
 }
 let vReq=0;
 async function loadVoters(reset){
   const my=++vReq;S.vLoading=true;if(reset){S.voters=[];render()}else render();
   let q=voterQuery("*",{count:"exact"});
-  if(S.sort==="house")q=q.order("house_no",{ascending:true,nullsFirst:false}).order("full_name");
+  if(S.sort==="roll")q=q.order("booth_id",{ascending:true,nullsFirst:false}).order("serial_no",{ascending:true,nullsFirst:false}).order("full_name");
+  else if(S.sort==="house")q=q.order("booth_id",{ascending:true,nullsFirst:false}).order("house_no",{ascending:true,nullsFirst:false}).order("full_name");
   else if(S.sort==="recent")q=q.order("updated_at",{ascending:false});
   else q=q.order("full_name");
   const from=reset?0:S.voters.length;
@@ -465,27 +516,41 @@ async function loadVoters(reset){
   S.voters=reset?data:S.voters.concat(data);S.vCount=count??S.voters.length;
   if(S.tab==="voters")render();
 }
+async function setHouse(ids,op){
+  const vs=ids.map(id=>S.voters.find(x=>x.id===id)).filter(Boolean);if(!vs.length)return;
+  const prev=vs.map(v=>v.opinion);vs.forEach(v=>v.opinion=op);render();
+  const {error}=await S.sb.from("voters").update({opinion:op}).in("id",ids);
+  if(error){vs.forEach((v,i)=>v.opinion=prev[i]);render();toast(errText(error));return}
+  vs.forEach((v,i)=>bumpSummary(v.ward_id,prev[i],op,v.booth_id));toast(t("saved"));
+}
 async function setOpinion(id,op){
   const v=S.voters.find(x=>x.id===id);if(!v)return;
   const prev=v.opinion;const next=prev===op?"unknown":op;
   v.opinion=next;render();
   const {error}=await S.sb.from("voters").update({opinion:next}).eq("id",id);
   if(error){v.opinion=prev;render();toast(errText(error));return}
-  bumpSummary(v.ward_id,prev,next);
+  bumpSummary(v.ward_id,prev,next,v.booth_id);
 }
-function bumpSummary(ward,prev,next){
-  const r=S.summary.find(x=>x.ward_id===ward);
-  if(r){r[prev]=Math.max(0,Number(r[prev])-1);r[next]=Number(r[next])+1}
+function bumpSummary(ward,prev,next,booth){
+  if(prev===next)return;
+  for(const r of [S.summary.find(x=>x.ward_id===ward),booth&&S.boothSum.find(x=>x.booth_id===booth)])
+    if(r){r[prev]=Math.max(0,Number(r[prev])-1);r[next]=Number(r[next])+1}
   refreshSummarySoon();
 }
 
 /* voter sheet */
 function openVoter(v){
-  const isNew=!v;v=v||{ward_id:S.vWard||S.me.ward_id||"",opinion:"unknown",issues:[]};
-  const wardSel=isMla()?`<label class="f">${esc(t("ward"))}<select id="vf-ward">${sortedWards().map(w=>`<option value="${esc(w.id)}" ${w.id===v.ward_id?"selected":""}>${esc(wardLabel(w))}</option>`).join("")}</select></label>`:"";
+  const isNew=!v;v=v||{ward_id:S.vWard||S.me.ward_id||"",booth_id:S.vBooth||null,section_no:S.vSec?Number(S.vSec):null,opinion:"unknown",issues:[]};
+  const fromRoll=!isNew&&v.booth_id&&v.serial_no;
+  const vb=v.booth_id?boothById(v.booth_id):null;
+  const myBooths=boothsIn(isMla()?null:S.me.ward_id);
+  const boothSel=fromRoll?`<div class="note" style="margin:0"><b>${esc(boothLabel(vb))}</b> · ${esc(t("serial"))} ${v.serial_no}${v.section_no?" · "+esc(secName(vb,v.section_no)):""}${v.relative_name?`<br>${esc(relLine(v))}`:""}</div>`
+    :(myBooths.length?`<div class="row"><label class="f">${esc(t("booth"))}<select id="vf-booth"><option value="">${esc(t("noBooth"))}</option>${myBooths.map(x=>`<option value="${esc(x.id)}" ${x.id===v.booth_id?"selected":""}>${esc(boothLabel(x))}</option>`).join("")}</select></label>
+      ${vb&&(vb.sections||[]).length?`<label class="f">${esc(t("lane"))}<select id="vf-sec"><option value="">—</option>${vb.sections.map(x=>`<option value="${x.no}" ${x.no===v.section_no?"selected":""}>${x.no}. ${esc(secName(vb,x.no))}</option>`).join("")}</select></label>`:""}</div>`:"");
+  const wardSel=fromRoll?"":isMla()?`<label class="f">${esc(t("ward"))}<select id="vf-ward">${sortedWards().map(w=>`<option value="${esc(w.id)}" ${w.id===v.ward_id?"selected":""}>${esc(wardLabel(w))}</option>`).join("")}</select></label>`:"";
   const by=!isNew&&v.updated_by?memberById(v.updated_by):null;
   openSheet(`<div class="sheet-head"><h3>${esc(isNew?t("addVoter"):t("editVoter"))}</h3><button class="btn ghost sm" type="button" data-close>✕</button></div>
-   ${wardSel}
+   ${boothSel}${wardSel}
    <label class="f">${esc(t("fullName"))} *<input type="text" id="vf-name" value="${esc(v.full_name||"")}" autocomplete="off"></label>
    <div class="row">
     <label class="f">${esc(t("houseNo"))}<input type="text" id="vf-house" value="${esc(v.house_no||"")}"></label>
@@ -513,7 +578,8 @@ async function saveVoter(id){
   const body={full_name:name,house_no:$("vf-house").value.trim()||null,age:age>=18&&age<=125?age:null,gender:picked("vf-gender"),
    opinion:picked("vf-op")||"unknown",issues:[...$("vf-issues").querySelectorAll('[aria-pressed="true"]')].map(b=>b.dataset.multi),
    epic_no:$("vf-epic").value.trim().toUpperCase()||null,phone:$("vf-phone").value.trim()||null,consent:$("vf-consent").checked,notes:$("vf-notes").value.trim()||null};
-  body.ward_id=isMla()?$("vf-ward").value:S.me.ward_id;
+  body.ward_id=isMla()&&$("vf-ward")?$("vf-ward").value:(S.voters.find(x=>x.id===id)?.ward_id||S.me.ward_id);
+  if($("vf-booth")){body.booth_id=$("vf-booth").value||null;const sv=$("vf-sec")?.value;body.section_no=body.booth_id&&sv?Number(sv):null}
   $("vf-save").disabled=true;
   const res=id?await S.sb.from("voters").update(body).eq("id",id).select().single():await S.sb.from("voters").insert(body).select().single();
   if(res.error){$("vf-save").disabled=false;$("vf-err").innerHTML=`<div class="note bad">${esc(errText(res.error))}</div>`;return}
@@ -572,11 +638,11 @@ async function runImport(){
 }
 async function exportCsv(){
   const btn=$("v-export");btn.disabled=true;
-  const all=[];for(let from=0;;from+=1000){const {data,error}=await voterQuery("*").order("full_name").range(from,from+999);if(error){toast(errText(error));btn.disabled=false;return}all.push(...data);if(data.length<1000)break}
+  const all=[];for(let from=0;;from+=1000){const {data,error}=await voterQuery("*").order("booth_id",{nullsFirst:false}).order("serial_no",{nullsFirst:false}).order("full_name").range(from,from+999);if(error){toast(errText(error));btn.disabled=false;return}all.push(...data);if(data.length<1000)break}
   const cell=v=>{const s=String(v??"");return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
   const iss=id=>S.issues.find(i=>i.id===id)?.en||"";
-  const head=["ward_number","ward_name","name","house_no","age","gender","phone","epic_no","opinion","issues","notes","phone_consent","updated_by","updated_at"];
-  const rows=all.map(v=>{const w=wardById(v.ward_id)||{};return [w.number,w.name,v.full_name,v.house_no,v.age,v.gender,v.phone,v.epic_no,v.opinion,(v.issues||[]).map(iss).join("; "),v.notes,v.consent?"yes":"no",memberById(v.updated_by)?.full_name||"",v.updated_at]});
+  const head=["ward_number","ward_name","booth_no","polling_station","lane","serial_no","name","relation","relative_name","house_no","age","gender","phone","epic_no","opinion","issues","notes","phone_consent","updated_by","updated_at"];
+  const rows=all.map(v=>{const w=wardById(v.ward_id)||{};const b=boothById(v.booth_id)||{};return [w.number,w.name,b.part_no,b.polling_station,v.section_no?secName(b,v.section_no):"",v.serial_no,v.full_name,v.relation,v.relative_name,v.house_no,v.age,v.gender,v.phone,v.epic_no,v.opinion,(v.issues||[]).map(iss).join("; "),v.notes,v.consent?"yes":"no",memberById(v.updated_by)?.full_name||"",v.updated_at]});
   const csv="﻿"+[head,...rows].map(r=>r.map(cell).join(",")).join("\n");
   const w=wardById(S.vWard);const name=`voters-${w?("ward-"+(w.number||w.name)):"all"}-${new Date().toISOString().slice(0,10)}.csv`.replace(/[^\w.-]/g,"-");
   if(window.AndroidBridge){AndroidBridge.shareFile(name,csv);btn.disabled=false;return}
@@ -600,6 +666,7 @@ function wardBlock(w,open){
     <div class="row" style="justify-content:flex-start">${isMla()?`<button class="btn sm fit" type="button" data-addm="ward_leader" data-w="${esc(w.id)}">+ ${esc(t("addLeader"))}</button>`:""}${canAddWorker?`<button class="btn sm fit" type="button" data-addm="worker" data-w="${esc(w.id)}">+ ${esc(t("addWorker"))}</button>`:""}${isMla()?`<button class="btn sm ghost fit" type="button" data-wedit="${esc(w.id)}">${esc(t("editWard"))}</button><button class="btn sm ghost danger fit ${S.armed==="w:"+w.id?"armed":""}" type="button" data-wdel="${esc(w.id)}">${esc(S.armed==="w:"+w.id?t("confirm"):t("delWard"))}</button>`:""}</div>
     <div><h3 style="font-size:.95rem;margin-bottom:2px">${esc(t("leaders"))}</h3>${leaders.length?`<ul class="mlist">${leaders.map(memberRow).join("")}</ul>`:`<p class="sub" style="margin:0">${esc(t("noLeader"))}</p>`}</div>
     <div><h3 style="font-size:.95rem;margin-bottom:2px">${esc(t("workers"))}</h3>${workers.length?`<ul class="mlist">${workers.map(memberRow).join("")}</ul>`:`<p class="sub" style="margin:0">${esc(t("noWorkers"))}</p>`}</div>
+    ${boothsIn(w.id).length?`<div><h3 style="font-size:.95rem;margin-bottom:2px">${esc(t("booths"))}</h3><ul class="mlist">${boothsIn(w.id).map(b=>{const bs=sumRows(S.boothSum.filter(r=>r.booth_id===b.id));return `<li class="member"><div class="grow"><div class="t">${esc(boothLabel(b))}</div><div class="m">${esc(b.polling_station||"")} · ${num(bs.total)} ${esc(t("votersN"))}</div></div>${isMla()&&S.wards.length>1?`<label class="f" style="flex:0 1 190px">${esc(t("moveTo"))}<select data-bmove="${esc(b.id)}">${sortedWards().map(x=>`<option value="${esc(x.id)}" ${x.id===b.ward_id?"selected":""}>${esc(wardLabel(x))}</option>`).join("")}</select></label>`:""}</li>`}).join("")}</ul></div>`:""}
    </div></details>`;
 }
 function vTeam(){
@@ -609,11 +676,66 @@ function vTeam(){
   const removed=S.members.filter(m=>!m.active&&canManage(m));
   if(removed.length)out+=`<details class="ward"><summary><span style="flex:1"><b style="font-family:var(--display)">${esc(t("removed"))}</b> <span class="code">${num(removed.length)}</span></span></summary><div class="body"><ul class="mlist">${removed.map(memberRow).join("")}</ul></div></details>`;
   if(isMla()){
+    out+=`<div class="panel"><div><h3>${esc(t("importRoll"))}</h3><p class="sub">${esc(t("importRollHelp"))}</p></div>
+     <input type="file" id="roll-file" accept=".json,application/json"><div id="roll-info"></div>
+     <div class="row"><span style="flex:1 1 0"></span><button class="btn primary fit" type="button" id="roll-go" disabled>${esc(t("doImport"))}</button></div></div>`;
     out+=`<div class="panel"><div><h3>${esc(t("setup"))}</h3><p class="sub">${esc(t("setupHelp"))}</p></div>
      <ul class="mlist">${S.issues.map(i=>`<li class="member"><div class="grow row" style="gap:6px"><input type="text" id="is-kn-${esc(i.id)}" value="${esc(i.kn)}" aria-label="${esc(t("issueKn"))}"><input type="text" id="is-en-${esc(i.id)}" value="${esc(i.en)}" aria-label="${esc(t("issueEn"))}"></div><div class="acts"><button class="btn sm" type="button" data-issave="${esc(i.id)}">${esc(t("save"))}</button><button class="btn sm ghost danger ${S.armed==="i:"+i.id?"armed":""}" type="button" data-isdel="${esc(i.id)}">${esc(S.armed==="i:"+i.id?t("confirm"):"✕")}</button></div></li>`).join("")}</ul>
      <div class="row"><input type="text" id="is-new-kn" placeholder="${esc(t("issueKn"))}" aria-label="${esc(t("issueKn"))}"><input type="text" id="is-new-en" placeholder="${esc(t("issueEn"))}" aria-label="${esc(t("issueEn"))}"><button class="btn fit" type="button" id="is-add">+ ${esc(t("addIssue"))}</button></div></div>`;
   }
   return out;
+}
+async function moveBooth(boothId,wardId){
+  const {error}=await S.sb.rpc("move_booth",{p_booth:boothId,p_ward:wardId});
+  if(error){toast(errText(error));render();return}
+  const b=boothById(boothId);if(b)b.ward_id=wardId;
+  toast(t("moved"));await loadAll();render();
+}
+let rollData=null;
+async function readRoll(file){
+  const info=$("roll-info");
+  try{rollData=JSON.parse(await file.text())}catch(e){rollData=null}
+  if(!rollData||!Array.isArray(rollData.booths)){info.innerHTML=`<div class="note bad">${esc(t("E_GENERIC"))}</div>`;$("roll-go").disabled=true;return}
+  const nv=rollData.booths.reduce((n,b)=>n+(b.voters||[]).length,0);
+  info.innerHTML=`<div class="note"><b>${num(rollData.booths.length)}</b> ${esc(t("boothsN"))} · <b>${num(nv)}</b> ${esc(t("votersN"))} — ${esc(t("rollReady"))}</div>`;
+  $("roll-go").disabled=false;
+}
+async function runRollImport(){
+  if(!rollData)return;
+  const btn=$("roll-go"),info=$("roll-info");btn.disabled=true;
+  const fail=e=>{info.innerHTML=`<div class="note bad">${esc(errText(e))}</div>`;btn.disabled=false;btn.textContent=t("doImport")};
+  // 1. wards: one per place (existing booths keep the ward the MLA chose)
+  const {data:exB,error:e1}=await S.sb.from("booths").select("id,part_no,ward_id");if(e1)return fail(e1);
+  const {data:exW,error:e2}=await S.sb.from("wards").select("id,name");if(e2)return fail(e2);
+  const wardByName=new Map(exW.map(w=>[w.name.trim().toLowerCase(),w.id]));
+  const boothByPart=new Map(exB.map(b=>[b.part_no,b]));
+  for(const b of rollData.booths){
+    if(boothByPart.has(b.part_no))continue;
+    const key=(b.place||"").trim().toLowerCase();
+    if(!wardByName.has(key)){const {data,error}=await S.sb.from("wards").insert({name:b.place}).select().single();if(error)return fail(error);wardByName.set(key,data.id)}
+  }
+  // 2. booths
+  let done=0;const total=rollData.booths.reduce((n,b)=>n+(b.voters||[]).length,0);
+  for(const b of rollData.booths){
+    const meta={part_no:b.part_no,place:b.place,polling_station:b.polling_station||null,ps_address:b.ps_address||null,post_office:b.post_office||null,police_station:b.police_station||null,pincode:b.pincode||null,sections:b.sections||[],roll_total:b.roll_total??null,roll_male:b.roll_male??null,roll_female:b.roll_female??null};
+    let booth=boothByPart.get(b.part_no);
+    if(booth){const {error}=await S.sb.from("booths").update(meta).eq("id",booth.id);if(error)return fail(error)}
+    else{const {data,error}=await S.sb.from("booths").insert({...meta,ward_id:wardByName.get((b.place||"").trim().toLowerCase())}).select().single();if(error)return fail(error);booth=data;boothByPart.set(b.part_no,data)}
+    // 3. voters (matched by voter ID so marked opinions are kept)
+    const rows=(b.voters||[]).map(v=>({ward_id:booth.ward_id,booth_id:booth.id,serial_no:v.serial,section_no:v.section_no||null,full_name:v.name,relation:v.relation||null,relative_name:v.relative||null,house_no:v.house_no||null,age:v.age&&v.age>=18&&v.age<=125?v.age:null,gender:["male","female","other"].includes(v.gender)?v.gender:(v.gender==="third"?"other":null),epic_no:v.epic||null}));
+    const withId=rows.filter(r=>r.epic_no),noId=rows.filter(r=>!r.epic_no);
+    for(let i=0;i<withId.length;i+=500){
+      const {error}=await S.sb.from("voters").upsert(withId.slice(i,i+500),{onConflict:"epic_no"});if(error)return fail(error);
+      done+=Math.min(500,withId.length-i);btn.textContent=`${t("loading")} ${pct(done,total)}%`;
+    }
+    if(noId.length){
+      const {data:have}=await S.sb.from("voters").select("serial_no").eq("booth_id",booth.id).is("epic_no",null);
+      const seen=new Set((have||[]).map(x=>x.serial_no));const fresh=noId.filter(r=>!seen.has(r.serial_no));
+      if(fresh.length){const {error}=await S.sb.from("voters").insert(fresh);if(error)return fail(error)}
+      done+=noId.length;btn.textContent=`${t("loading")} ${pct(done,total)}%`;
+    }
+  }
+  rollData=null;toast(t("rollDone"));await loadAll();render();
 }
 function openWard(w){
   openSheet(`<div class="sheet-head"><h3>${esc(w?t("editWard"):t("addWard"))}</h3><button class="btn ghost sm" type="button" data-close>✕</button></div>
@@ -715,17 +837,20 @@ document.addEventListener("click",async ev=>{
   if(b.id==="ac-out"){await S.sb.auth.signOut();S.me=null;closeSheet();viewLogin();return}
   if(b.id==="ac-save"){const pw=$("ac-pw").value;const {error}=await S.sb.auth.updateUser({password:pw});if(error){$("ac-err").innerHTML=`<div class="note bad">${esc(errText(error))}</div>`;return}closeSheet();toast(t("pwChanged"));return}
   // dashboard
-  if(d.dward){S.dashWard=d.dward;render();window.scrollTo(0,0);refreshSummarySoon();return}
-  if(b.id==="dash-back"){S.dashWard=null;render();refreshSummarySoon();return}
+  if(d.dward){S.dashWard=d.dward;S.dashBooth=null;render();window.scrollTo(0,0);refreshSummarySoon();return}
+  if(d.dbooth){S.dashBooth=d.dbooth;S.secSum=[];render();window.scrollTo(0,0);const r=await S.sb.rpc("section_summary",{p_booth:d.dbooth});if(!r.error){S.secSum=r.data||[];render()}return}
+  if(b.id==="dash-back"){if(S.dashBooth){S.dashBooth=null}else if(isMla()){S.dashWard=null}render();refreshSummarySoon();return}
   // voters
   if(d.vfilter){S.op=S.op===d.vfilter?"":d.vfilter;loadVoters(true);return}
   if(d.vop){setOpinion(d.vop,d.op);return}
+  if(d.hop){setHouse(d.hop.split(","),d.op);return}
   if(d.vedit){openVoter(S.voters.find(v=>v.id===d.vedit));return}
   if(b.id==="v-add"){openVoter(null);return}
   if(b.id==="v-more"){loadVoters(false);return}
   if(b.id==="v-export"){exportCsv();return}
   if(b.id==="v-import"){openImport();return}
   if(b.id==="im-go"){runImport();return}
+  if(b.id==="roll-go"){runRollImport();return}
   if(b.id==="vf-save"){saveVoter(d.id);return}
   if(b.id==="vf-del"){deleteVoter(d.id,b);return}
   if(d.pick){const box=b.parentElement;const was=b.getAttribute("aria-pressed")==="true";box.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false"));if(!was)b.setAttribute("aria-pressed","true");return}
@@ -756,15 +881,21 @@ document.addEventListener("input",ev=>{
 });
 document.addEventListener("change",ev=>{
   const el=ev.target;
-  if(el.id==="v-ward"){S.vWard=el.value;loadVoters(true)}
+  if(el.id==="v-ward"){S.vWard=el.value;S.vBooth="";S.vSec="";loadVoters(true)}
+  else if(el.id==="v-booth"){S.vBooth=el.value;S.vSec="";loadVoters(true)}
+  else if(el.id==="v-sec"){S.vSec=el.value;loadVoters(true)}
+  else if(el.dataset.bmove){moveBooth(el.dataset.bmove,el.value)}
   else if(el.id==="v-sort"){S.sort=el.value;loadVoters(true)}
   else if(el.id==="im-file"&&el.files[0])readImport(el.files[0]);
+  else if(el.id==="roll-file"&&el.files[0])readRoll(el.files[0]);
+  else if(el.id==="vf-booth"){const vb=boothById(el.value);const box=el.closest(".row");box.querySelector("#vf-sec")?.closest("label")?.remove();if(vb&&(vb.sections||[]).length){box.insertAdjacentHTML("beforeend",`<label class="f">${esc(t("lane"))}<select id="vf-sec"><option value="">—</option>${vb.sections.map(x=>`<option value="${x.no}">${x.no}. ${esc(secName(vb,x.no))}</option>`).join("")}</select></label>`)}}
 });
 
 /* Android back button: close a sheet, then return to the dashboard, then leave the app */
 window.appBack=function(){
   if(!$("sheetbg").hidden){closeSheet();return true}
   if(S.me&&S.tab!=="dashboard"){S.tab="dashboard";render();window.scrollTo(0,0);return true}
+  if(S.me&&S.dashBooth){S.dashBooth=null;render();return true}
   if(S.me&&S.dashWard&&isMla()){S.dashWard=null;render();refreshSummarySoon();return true}
   return false;
 };
