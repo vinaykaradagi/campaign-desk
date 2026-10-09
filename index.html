@@ -58,6 +58,9 @@ header.top{display:flex;align-items:center;gap:10px;padding-block:12px;border-bo
 .wseg{display:flex;background:var(--sunk);border-radius:12px;padding:4px;gap:4px}
 .wseg button{flex:1;border:0;background:none;padding:10px 6px;border-radius:9px;font-weight:600;color:var(--muted);cursor:pointer;font-size:.95rem}
 .wseg button[aria-selected="true"]{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgb(0 0 0 / .12)}
+.v-ps{display:block;font-size:.78rem;color:var(--accent);overflow-wrap:anywhere;line-height:1.35;margin-top:2px}
+.ps-box{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:10px 12px;background:var(--surface)}
+.ps-box .grow{flex:1;min-width:0;overflow-wrap:anywhere}
 .wseg.sm{padding:3px}.wseg.sm button{padding:7px 6px;font-size:.88rem}
 .house.done{background:var(--ok-soft)} .house .tick{color:var(--ok);font-weight:700}
 .area-hn{grid-column:1/-1;color:var(--muted);font-size:.78rem;line-height:1.35;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -226,7 +229,8 @@ nav.tabs button[aria-current="page"]{color:var(--accent);font-weight:600}
 "use strict";
 /* ================= strings ================= */
 const T={
-en:{areasTab:"Areas / lanes",listTab:"All voters",findArea:"Find lane, area or house no.",areasN:"areas",tapArea:"Tap an area to see its houses in order.",allAreas:"All areas",hno:"H.No.",houses:"houses",housesDone:"done",noAreas:"No lane list from the electoral roll for this ward.",
+en:{openMap:"Open in Maps",whereVote:"Votes at",
+ areasTab:"Areas / lanes",listTab:"All voters",findArea:"Find lane, area or house no.",areasN:"areas",tapArea:"Tap an area to see its houses in order.",allAreas:"All areas",hno:"H.No.",houses:"houses",housesDone:"done",noAreas:"No lane list from the electoral roll for this ward.",
  app:"Saundatti Constituency Survey",tools:"Settings & tools",party:"Saundatti Youth Party",
  polling_tab:"Polling day",notices:"Notice board",postNotice:"Post notice",noticePh:"Write a message for your team…",everyone:"Everyone",noNotices:"No notices yet.",posted:"Posted",
  turnout:"Turnout",votedN:"voted",markVoted:"Mark voted",undoVoted:"Undo",hasVoted:"Voted",serialSearch:"Serial no. on the roll",find:"Find",notFound:"No voter with that serial number in this booth.",
@@ -266,7 +270,8 @@ en:{areasTab:"Areas / lanes",listTab:"All voters",findArea:"Find lane, area or h
  E_WARD_IN_USE:"This ward still has people or voters. Move or remove them first.",E_NET:"No connection. Check your internet and try again.",E_GENERIC:"Something went wrong. Try again.",
  notConfigured:"App not set up yet",notConfiguredB:"Open config.js and paste your Supabase project URL and key, then reload this page.",
  privacy:"Voter details are private campaign data. Do not share screenshots outside the team."},
-kn:{areasTab:"ಓಣಿ / ಪ್ರದೇಶ",listTab:"ಎಲ್ಲಾ ಮತದಾರರು",findArea:"ಓಣಿ, ಪ್ರದೇಶ ಅಥವಾ ಮನೆ ಸಂಖ್ಯೆ ಹುಡುಕಿ",areasN:"ಪ್ರದೇಶಗಳು",tapArea:"ಮನೆಗಳನ್ನು ಕ್ರಮವಾಗಿ ನೋಡಲು ಪ್ರದೇಶದ ಮೇಲೆ ಒತ್ತಿ.",allAreas:"ಎಲ್ಲಾ ಪ್ರದೇಶಗಳು",hno:"ಮನೆ ಸಂ.",houses:"ಮನೆಗಳು",housesDone:"ಮುಗಿದಿದೆ",noAreas:"ಈ ವಾರ್ಡ್‌ಗೆ ಮತದಾರರ ಪಟ್ಟಿಯ ಓಣಿ ವಿವರ ಇಲ್ಲ.",
+kn:{openMap:"ನಕ್ಷೆಯಲ್ಲಿ ನೋಡಿ",whereVote:"ಮತ ಹಾಕುವ ಸ್ಥಳ",
+ areasTab:"ಓಣಿ / ಪ್ರದೇಶ",listTab:"ಎಲ್ಲಾ ಮತದಾರರು",findArea:"ಓಣಿ, ಪ್ರದೇಶ ಅಥವಾ ಮನೆ ಸಂಖ್ಯೆ ಹುಡುಕಿ",areasN:"ಪ್ರದೇಶಗಳು",tapArea:"ಮನೆಗಳನ್ನು ಕ್ರಮವಾಗಿ ನೋಡಲು ಪ್ರದೇಶದ ಮೇಲೆ ಒತ್ತಿ.",allAreas:"ಎಲ್ಲಾ ಪ್ರದೇಶಗಳು",hno:"ಮನೆ ಸಂ.",houses:"ಮನೆಗಳು",housesDone:"ಮುಗಿದಿದೆ",noAreas:"ಈ ವಾರ್ಡ್‌ಗೆ ಮತದಾರರ ಪಟ್ಟಿಯ ಓಣಿ ವಿವರ ಇಲ್ಲ.",
  app:"ಸವದತ್ತಿ ಕ್ಷೇತ್ರ ಸಮೀಕ್ಷೆ",tools:"ಸೆಟ್ಟಿಂಗ್ಸ್ ಮತ್ತು ಉಪಕರಣಗಳು",party:"ಸವದತ್ತಿ ಯುವ ಪಕ್ಷ",
  polling_tab:"ಮತದಾನ ದಿನ",notices:"ಸೂಚನಾ ಫಲಕ",postNotice:"ಸೂಚನೆ ಹಾಕಿ",noticePh:"ತಂಡಕ್ಕೆ ಸಂದೇಶ ಬರೆಯಿರಿ…",everyone:"ಎಲ್ಲರಿಗೂ",noNotices:"ಇನ್ನೂ ಸೂಚನೆಗಳಿಲ್ಲ.",posted:"ಹಾಕಲಾಗಿದೆ",
  turnout:"ಮತದಾನ ಪ್ರಮಾಣ",votedN:"ಮತ ಚಲಾಯಿಸಿದ್ದಾರೆ",markVoted:"ಮತ ಚಲಾಯಿಸಿದ್ದಾರೆ ಎಂದು ಗುರುತಿಸಿ",undoVoted:"ರದ್ದು",hasVoted:"ಮತ ಹಾಕಿದ್ದಾರೆ",serialSearch:"ಪಟ್ಟಿಯ ಕ್ರಮ ಸಂಖ್ಯೆ",find:"ಹುಡುಕಿ",notFound:"ಈ ಮತಗಟ್ಟೆಯಲ್ಲಿ ಆ ಕ್ರಮ ಸಂಖ್ಯೆಯ ಮತದಾರರಿಲ್ಲ.",
@@ -539,6 +544,9 @@ const lead=x=>{const m=String(x).match(/\d+/);return m?Number(m[0]):NaN};
 function areaHasHouse(a,n){for(const h of a.hn)for(const part of h.split(/[,&]/)){const ends=part.split(/\s*(?:to|-)\s*/i).map(lead).filter(x=>!isNaN(x));if(!ends.length)continue;const lo=Math.min(...ends),hi=Math.max(...ends);if(n>=lo&&n<=hi)return true}return false}
 const natKey=x=>String(x||"").toLowerCase().split(/(\d+)/).map(p=>/^\d+$/.test(p)?p.padStart(9,"0"):p).join("");
 const houseCmp=(a,b)=>(a.house_no?0:1)-(b.house_no?0:1)||natKey(a.house_no).localeCompare(natKey(b.house_no))||(a.part_no||0)-(b.part_no||0)||(a.serial_no||0)-(b.serial_no||0);
+const psText=b=>b?`${t("booth")} ${b.part_no} · ${b.polling_station||b.place||""}`:"";
+const mapUrl=b=>"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent([b.polling_station||b.ps_address||"",b.place||"",CFG.CONSTITUENCY_EN||"","Belagavi, Karnataka"].filter(Boolean).join(", "));
+function psBox(b,serial){if(!b)return "";return `<div class="ps-box"><span aria-hidden="true">🏫</span><div class="grow"><b>${esc(t("polling"))}</b><br>${esc(psText(b))}${serial?` · ${esc(t("serial"))} ${serial}`:""}</div><button class="btn sm fit" type="button" data-map="${esc(b.id)}">📍 ${esc(t("openMap"))}</button></div>`}
 function modeSeg(){return `<div class="wseg sm" role="tablist">${[["areas","areasTab"],["list","listTab"]].map(([k,l])=>`<button type="button" role="tab" data-vmode="${k}" aria-selected="${S.vmode===k}">${esc(t(l))}</button>`).join("")}</div>`}
 function areaMeta(a){return `${t("booth")} ${a.booths.join(", ")}${a.hn.length?" · "+t("hno")+" "+a.hn.join(" · "):""}`}
 function vAreas(list){
@@ -583,12 +591,13 @@ function vVoters(){
     lastKey=key;
     const b=v.booth_id?boothById(v.booth_id):null;
     const meta=[v.serial_no?`${t("serial")} ${v.serial_no}`:"",!S.vBooth&&b&&!oneBooth?`${t("booth")} ${b.part_no}`:"",v.house_no&&!grouped?`${t("houseN")} ${v.house_no}`:"",[v.age||"",v.gender?(S.lang==="en"?t(v.gender)[0]:t(v.gender)):""].filter(Boolean).join(" "),v.relative_name?relLine(v):""].filter(Boolean).join(" · ");
-    parts.push(`<li class="voter"><button class="v-main" type="button" data-vedit="${esc(v.id)}"><span class="v-name">${esc(v.full_name)}${v.voted?` <span class="voted">✓</span>`:""}</span><span class="v-meta">${esc(meta)||"&nbsp;"}</span></button>${v.phone?`<button class="btn sm ghost" type="button" data-call="${esc(v.phone)}" aria-label="${esc(t("call"))}">📞</button>`:""}
+    const psLine=S.q.trim()&&b?`<span class="v-ps">🏫 ${esc(t("whereVote"))}: ${esc(psText(b))}</span>`:"";
+    parts.push(`<li class="voter"><button class="v-main" type="button" data-vedit="${esc(v.id)}"><span class="v-name">${esc(v.full_name)}${v.voted?` <span class="voted">✓</span>`:""}</span><span class="v-meta">${esc(meta)||"&nbsp;"}</span>${psLine}</button>${v.phone?`<button class="btn sm ghost" type="button" data-call="${esc(v.phone)}" aria-label="${esc(t("call"))}">📞</button>`:""}
      <div class="opseg" role="group" aria-label="${esc(t("opinion"))}">${["my_side","neutral","opposite"].map(o=>`<button type="button" data-vop="${esc(v.id)}" data-op="${o}" aria-pressed="${v.opinion===o}">${esc(t(o))}</button>`).join("")}</div></li>`);
   });
   const filtered=S.q||S.op||S.vSec;
   const bopts=boothsIn(W);
-  const head=A?`<div><button class="btn sm ghost" type="button" id="a-back" style="padding-left:0">← ${esc(t("allAreas"))}</button><h2>${esc(A.lane)}</h2><p class="sub" style="overflow-wrap:anywhere">${esc(areaMeta(A))}</p></div>`:(areas.length?modeSeg():"");
+  const head=A?`<div><button class="btn sm ghost" type="button" id="a-back" style="padding-left:0">← ${esc(t("allAreas"))}</button><h2>${esc(A.lane)}</h2><p class="sub" style="overflow-wrap:anywhere">${esc(areaMeta(A))}</p>${[...new Set(A.parts.map(p=>p[0]))].map(id=>`<p class="v-ps" style="font-size:.84rem">🏫 ${esc(psText(boothById(id)))}</p>`).join("")}</div>`:(areas.length?modeSeg():"");
   return `${wardSwitch()}${head}
   <div class="panel tight">
    <input type="search" id="v-q" value="${esc(S.q)}" autocomplete="off" placeholder="🔍 ${esc(t("search"))}" aria-label="${esc(t("search"))}">
@@ -693,7 +702,7 @@ function openVoter(v){
   const wardSel=fromRoll?"":isMla()?`<label class="f">${esc(t("ward"))}<select id="vf-ward">${sortedWards().map(w=>`<option value="${esc(w.id)}" ${w.id===v.ward_id?"selected":""}>${esc(wardLabel(w))}</option>`).join("")}</select></label>`:"";
   const by=!isNew&&v.updated_by?memberById(v.updated_by):null;
   openSheet(`<div class="sheet-head"><h3>${esc(isNew?t("addVoter"):t("editVoter"))}</h3><button class="btn ghost sm" type="button" data-close>✕</button></div>
-   ${boothSel}${wardSel}
+   ${!isNew&&vb?psBox(vb,v.serial_no):""}${boothSel}${wardSel}
    <label class="f">${esc(t("fullName"))} *<input type="text" id="vf-name" value="${esc(v.full_name||"")}" autocomplete="off"></label>
    <div class="row">
     <label class="f">${esc(t("houseNo"))}<input type="text" id="vf-house" value="${esc(v.house_no||"")}"></label>
@@ -1105,7 +1114,7 @@ async function setVoted(id,v){
 /* ================= voter slip & history ================= */
 function slipText(v){const b=boothById(v.booth_id)||{};
   return [`*${t("slipTitle")}*`,`${t("fullName")}: ${v.full_name}`,v.relative_name?relLine(v):"",v.epic_no?`${t("epic")}: ${v.epic_no}`:"",
-    b.part_no?`${t("booth")}: ${b.part_no} — ${b.polling_station||""}`:"",v.serial_no?`${t("serial")}: ${v.serial_no}`:"",v.house_no?`${t("houseNo")}: ${v.house_no}`:""].filter(Boolean).join("\n")}
+    b.part_no?`${t("booth")}: ${b.part_no}`:"",b.polling_station?`${t("polling")}: ${b.polling_station}`:"",v.serial_no?`${t("serial")}: ${v.serial_no}`:"",b.id?`📍 ${mapUrl(b)}`:"",v.house_no?`${t("houseNo")}: ${v.house_no}`:""].filter(Boolean).join("\n")}
 async function loadHistory(id){
   const box=$("vf-hist");if(!box)return;
   const {data,error}=await S.sb.from("voter_history").select("*").eq("voter_id",id).order("changed_at",{ascending:false}).limit(10);
@@ -1145,6 +1154,7 @@ document.addEventListener("click",async ev=>{
   if(d.lang){S.lang=d.lang;store("cd.lang",S.lang);S.me?render():(configured?viewLogin():viewNotConfigured());return}
   if("close" in d){closeSheet();return}
   if(d.tab){S.tab=d.tab;S.armed=null;store("cd.tab",S.tab);render();window.scrollTo(0,0);if(S.tab==="voters")loadVoters(true);if(S.tab==="polling"){S.pFound=null;loadPolling()}return}
+  if(d.map){const b=boothById(d.map);if(b)openExternal(mapUrl(b));return}
   if(d.call){openExternal("tel:"+d.call.replace(/[^\d+]/g,""));return}
   if(d.pvote){setVoted(d.pvote,d.v==="1");return}
   if(d.ndel){if(S.armed!=="n:"+d.ndel){S.armed="n:"+d.ndel;render();return}S.armed=null;const {error}=await S.sb.from("notices").delete().eq("id",d.ndel);if(error){toast(errText(error));return}S.notices=S.notices.filter(n=>n.id!==d.ndel);render();return}

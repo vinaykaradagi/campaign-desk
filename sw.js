@@ -1,7 +1,7 @@
 /* Saundatti Constituency Survey — lets the web app open with no internet.
    App files are kept on the phone; voter data is never stored here
    (the app keeps its own small offline copy). */
-const CACHE = "syp-survey-v2";
+const CACHE = "syp-survey-v3";
 const SHELL = ["./", "index.html", "config.js", "manifest.json", "logo-96.png", "logo-192.png", "icon-192.png", "icon-512.png",
   "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"];
 
