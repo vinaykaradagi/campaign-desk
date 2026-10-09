@@ -66,6 +66,9 @@ header.top{display:flex;align-items:center;gap:10px;padding-block:12px;border-bo
 .bchk small{display:block;color:var(--muted);font-size:.78rem}.blist{max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:0 10px}
 .btags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.btag{font-family:var(--mono);font-size:.74rem;background:var(--sunk);border-radius:6px;padding:1px 6px;color:var(--fg)}
 .sub-members{margin-left:14px;border-left:2px solid var(--line);padding-left:10px}
+.sugg{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:-6px;background:var(--surface)}
+.sugg button{border:0;border-top:1px solid var(--line);background:none;text-align:left;padding:9px 11px;cursor:pointer;color:var(--fg);font-size:.92rem}
+.sugg button:first-child{border-top:0}.sugg button:hover,.sugg button:focus{background:var(--accent-soft)}.sugg small{display:block;color:var(--muted);font-size:.76rem}
 .wseg.sm{padding:3px}.wseg.sm button{padding:7px 6px;font-size:.88rem}
 .house.done{background:var(--ok-soft)} .house .tick{color:var(--ok);font-weight:700}
 .area-hn{grid-column:1/-1;color:var(--muted);font-size:.78rem;line-height:1.35;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -234,7 +237,8 @@ nav.tabs button[aria-current="page"]{color:var(--accent);font-weight:600}
 "use strict";
 /* ================= strings ================= */
 const T={
-en:{myBooths:"My booths",boothsLbl:"Booths",noBoothsYet:"No booths yet",assignBooths:"Booths",chooseBooths:"Choose booths",takenBy:"given to",freeBooths:"Booths without a ward leader",freeWorkerBooths:"My booths without a worker",noWorkerYet:"No worker yet",leaderLbl:"Leader",workerLbl:"Worker",myLeader:"My ward leader",
+en:{pickVoter:"Type 3 letters — matching names from the voter list appear",fromRoll:"From voter list",noMatch:"Not in the voter list — you can still type the name",
+ myBooths:"My booths",boothsLbl:"Booths",noBoothsYet:"No booths yet",assignBooths:"Booths",chooseBooths:"Choose booths",takenBy:"given to",freeBooths:"Booths without a ward leader",freeWorkerBooths:"My booths without a worker",noWorkerYet:"No worker yet",leaderLbl:"Leader",workerLbl:"Worker",myLeader:"My ward leader",
  noBoothsLeader:"No booths have been given to you yet. Ask the MLA.",noBoothsWorker:"No booths have been given to you yet. Ask your ward leader.",surveyed:"Surveyed",remaining:"Remaining",myVoters:"My voters",progress:"Survey progress",
  E_BOOTH_TAKEN:"Already given to someone else — booth",E_BOOTH_WARD:"A ward leader can get booths of his own ward only.",E_BOOTH_NOT_YOURS:"You can give only your own booths.",E_BOOTH_REQUIRED:"Choose a booth.",
  openMap:"Open in Maps",whereVote:"Votes at",
@@ -278,7 +282,8 @@ en:{myBooths:"My booths",boothsLbl:"Booths",noBoothsYet:"No booths yet",assignBo
  E_WARD_IN_USE:"This ward still has people or voters. Move or remove them first.",E_NET:"No connection. Check your internet and try again.",E_GENERIC:"Something went wrong. Try again.",
  notConfigured:"App not set up yet",notConfiguredB:"Open config.js and paste your Supabase project URL and key, then reload this page.",
  privacy:"Voter details are private campaign data. Do not share screenshots outside the team."},
-kn:{myBooths:"ನನ್ನ ಮತಗಟ್ಟೆಗಳು",boothsLbl:"ಮತಗಟ್ಟೆಗಳು",noBoothsYet:"ಇನ್ನೂ ಮತಗಟ್ಟೆ ಇಲ್ಲ",assignBooths:"ಮತಗಟ್ಟೆಗಳು",chooseBooths:"ಮತಗಟ್ಟೆಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ",takenBy:"ಇವರಿಗೆ ನೀಡಲಾಗಿದೆ",freeBooths:"ವಾರ್ಡ್ ಮುಖಂಡರಿಲ್ಲದ ಮತಗಟ್ಟೆಗಳು",freeWorkerBooths:"ಕಾರ್ಯಕರ್ತರಿಲ್ಲದ ನನ್ನ ಮತಗಟ್ಟೆಗಳು",noWorkerYet:"ಇನ್ನೂ ಕಾರ್ಯಕರ್ತರಿಲ್ಲ",leaderLbl:"ಮುಖಂಡ",workerLbl:"ಕಾರ್ಯಕರ್ತ",myLeader:"ನನ್ನ ವಾರ್ಡ್ ಮುಖಂಡ",
+kn:{pickVoter:"3 ಅಕ್ಷರ ಬರೆಯಿರಿ — ಮತದಾರರ ಪಟ್ಟಿಯ ಹೆಸರುಗಳು ಕಾಣುತ್ತವೆ",fromRoll:"ಮತದಾರರ ಪಟ್ಟಿಯಿಂದ",noMatch:"ಮತದಾರರ ಪಟ್ಟಿಯಲ್ಲಿ ಇಲ್ಲ — ಹೆಸರನ್ನು ಹಾಗೆಯೇ ಬರೆಯಬಹುದು",
+ myBooths:"ನನ್ನ ಮತಗಟ್ಟೆಗಳು",boothsLbl:"ಮತಗಟ್ಟೆಗಳು",noBoothsYet:"ಇನ್ನೂ ಮತಗಟ್ಟೆ ಇಲ್ಲ",assignBooths:"ಮತಗಟ್ಟೆಗಳು",chooseBooths:"ಮತಗಟ್ಟೆಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ",takenBy:"ಇವರಿಗೆ ನೀಡಲಾಗಿದೆ",freeBooths:"ವಾರ್ಡ್ ಮುಖಂಡರಿಲ್ಲದ ಮತಗಟ್ಟೆಗಳು",freeWorkerBooths:"ಕಾರ್ಯಕರ್ತರಿಲ್ಲದ ನನ್ನ ಮತಗಟ್ಟೆಗಳು",noWorkerYet:"ಇನ್ನೂ ಕಾರ್ಯಕರ್ತರಿಲ್ಲ",leaderLbl:"ಮುಖಂಡ",workerLbl:"ಕಾರ್ಯಕರ್ತ",myLeader:"ನನ್ನ ವಾರ್ಡ್ ಮುಖಂಡ",
  noBoothsLeader:"ನಿಮಗೆ ಇನ್ನೂ ಮತಗಟ್ಟೆಗಳನ್ನು ನೀಡಿಲ್ಲ. ಶಾಸಕರನ್ನು ಕೇಳಿ.",noBoothsWorker:"ನಿಮಗೆ ಇನ್ನೂ ಮತಗಟ್ಟೆಗಳನ್ನು ನೀಡಿಲ್ಲ. ನಿಮ್ಮ ವಾರ್ಡ್ ಮುಖಂಡರನ್ನು ಕೇಳಿ.",surveyed:"ಸಮೀಕ್ಷೆ ಆಗಿದೆ",remaining:"ಬಾಕಿ",myVoters:"ನನ್ನ ಮತದಾರರು",progress:"ಸಮೀಕ್ಷೆ ಪ್ರಗತಿ",
  E_BOOTH_TAKEN:"ಈಗಾಗಲೇ ಬೇರೆಯವರಿಗೆ ನೀಡಲಾಗಿದೆ — ಮತಗಟ್ಟೆ",E_BOOTH_WARD:"ವಾರ್ಡ್ ಮುಖಂಡರಿಗೆ ಅವರ ವಾರ್ಡ್‌ನ ಮತಗಟ್ಟೆಗಳನ್ನು ಮಾತ್ರ ನೀಡಬಹುದು.",E_BOOTH_NOT_YOURS:"ನಿಮ್ಮ ಮತಗಟ್ಟೆಗಳನ್ನು ಮಾತ್ರ ನೀಡಬಹುದು.",E_BOOTH_REQUIRED:"ಮತಗಟ್ಟೆ ಆಯ್ಕೆಮಾಡಿ.",
  openMap:"ನಕ್ಷೆಯಲ್ಲಿ ನೋಡಿ",whereVote:"ಮತ ಹಾಕುವ ಸ್ಥಳ",
@@ -988,12 +993,35 @@ async function saveBooths(btn){
   if(error){btn.disabled=false;$("bp-err").innerHTML=`<div class="note bad">${esc(errText(error))}</div>`;return}
   await loadAll();closeSheet();render();toast(t("saved"));
 }
+let msT=0,msReq=0;
+function memberSuggest(){
+  clearTimeout(msT);const box=$("mf-sugg");if(!box)return;
+  const term=$("mf-name").value.replace(/[,()%*\\"':]/g," ").replace(/\s+/g," ").trim();
+  if(term.length<3){box.innerHTML="";S.msugg=[];return}
+  msT=setTimeout(async()=>{
+    const my=++msReq;let q=S.sb.from("voters").select("id,full_name,relation,relative_name,age,gender,house_no,part_no,phone,epic_no").ilike("full_name",`%${term}%`);
+    const w=isMla()?$("mf-ward")?.value:null;if(w)q=q.eq("ward_id",w);
+    const {data,error}=await q.order("full_name").limit(8);
+    if(my!==msReq||!$("mf-sugg"))return;
+    if(error){box.innerHTML="";return}
+    S.msugg=data||[];
+    box.innerHTML=S.msugg.length?`<div class="sugg" role="listbox">${S.msugg.map((v,i)=>`<button type="button" role="option" data-msugg="${i}"><b>${esc(v.full_name)}</b><small>${esc([relLine(v),[v.age||"",v.gender?t(v.gender):""].filter(Boolean).join(" "),v.part_no?`${t("booth")} ${v.part_no}`:"",v.house_no?`${t("houseN")} ${v.house_no}`:"",v.epic_no||""].filter(Boolean).join(" · "))}</small></button>`).join("")}</div>`:`<p class="sub" style="margin:-6px 0 0;font-size:.8rem">${esc(t("noMatch"))}</p>`;
+  },300);
+}
+function pickSuggest(i){
+  const v=S.msugg?.[i];if(!v)return;
+  $("mf-name").value=v.full_name;
+  if(v.phone&&!$("mf-phone").value)$("mf-phone").value=v.phone;
+  const lg=$("mf-login");if(lg&&!lg.value){const first=(v.full_name.toLowerCase().match(/[a-z]+/)||[""])[0];if(first)lg.value=(first+(v.part_no?"."+v.part_no:"")).slice(0,30)}
+  $("mf-sugg").innerHTML=`<p class="sub" style="margin:-6px 0 0;font-size:.8rem">✓ ${esc(t("fromRoll"))}: ${esc([v.part_no?t("booth")+" "+v.part_no:"",v.epic_no||""].filter(Boolean).join(" · "))}</p>`;S.msugg=[];
+}
 function openMember(role,wardId,m){
   const edit=!!m;
   const wsel=isMla()?`<label class="f">${esc(t("ward"))}<select id="mf-ward">${sortedWards().map(w=>`<option value="${esc(w.id)}" ${w.id===(m?.ward_id||wardId)?"selected":""}>${esc(wardLabel(w))}</option>`).join("")}</select></label>`:"";
   openSheet(`<div class="sheet-head"><h3>${esc(edit?t("editMember"):role==="ward_leader"?t("addLeader"):t("addWorker"))}</h3><button class="btn ghost sm" type="button" data-close>✕</button></div>
    ${wsel}
-   <label class="f">${esc(t("fullName"))} *<input type="text" id="mf-name" value="${esc(m?.full_name||"")}"></label>
+   <label class="f">${esc(t("fullName"))} *<input type="text" id="mf-name" value="${esc(m?.full_name||"")}" autocomplete="off" ${edit?"":`placeholder="${esc(t("pickVoter"))}"`}></label>
+   ${edit?"":`<div id="mf-sugg"></div>`}
    <label class="f">${esc(t("phone"))}<input type="tel" id="mf-phone" value="${esc(m?.phone||"")}" inputmode="tel"></label>
    ${edit?"":`<div class="row"><label class="f">${esc(t("loginId"))} *<input type="text" id="mf-login" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="ravi.w3"></label>
    <label class="f">${esc(t("password"))} *<div style="display:flex;gap:6px"><input type="text" id="mf-pw" value="${genPw()}" autocomplete="off" spellcheck="false"><button class="btn sm" type="button" id="mf-gen">${esc(t("generate"))}</button></div></label></div>
@@ -1268,6 +1296,7 @@ document.addEventListener("click",async ev=>{
   if(b.id==="wf-save"){saveWard(d.id);return}
   if(d.wdel){if(S.armed!=="w:"+d.wdel){S.armed="w:"+d.wdel;render();return}S.armed=null;const {error}=await S.sb.from("wards").delete().eq("id",d.wdel);if(error){toast(errText(error));render();return}S.wards=S.wards.filter(w=>w.id!==d.wdel);if(S.cw===d.wdel){S.cw="";const f=sortedWards()[0];if(f){S.cw=S.vWard=S.dashWard=f.id;store("cd.ward",f.id)}else{S.vWard="";S.dashWard=null}}render();return}
   if(d.addm){openMember(d.addm,d.w,null);return}
+  if(d.msugg!=null){pickSuggest(Number(d.msugg));return}
   if(d.mbooths){openBooths(memberById(d.mbooths));return}
   if(b.id==="bp-save"){saveBooths(b);return}
   if(d.medit){const m=memberById(d.medit);openMember(m.role,m.ward_id,m);return}
@@ -1289,6 +1318,7 @@ document.addEventListener("input",ev=>{
   const el=ev.target;
   if(el.id==="v-q"){S.q=el.value;clearTimeout(qT);qT=setTimeout(()=>loadVoters(true),350)}
   if(el.id==="a-q"){S.aq=el.value;render()}
+  if(el.id==="mf-name")memberSuggest();
 });
 document.addEventListener("change",ev=>{
   const el=ev.target;
@@ -1296,7 +1326,7 @@ document.addEventListener("change",ev=>{
   else if(el.id==="v-booth"){S.vBooth=el.value;S.vSec="";loadVoters(true)}
   else if(el.id==="v-sec"){S.vSec=el.value;loadVoters(true)}
   else if(el.dataset.bmove){moveBooth(el.dataset.bmove,el.value)}
-  else if(el.id==="mf-ward"&&$("mf-booths")){$("mf-booths").innerHTML=boothPicker(null,$("mf-save").dataset.role,el.value)}
+  else if(el.id==="mf-ward"&&$("mf-booths")){$("mf-booths").innerHTML=boothPicker(null,$("mf-save").dataset.role,el.value);memberSuggest()}
   else if(el.id==="v-sort"){S.sort=el.value;loadVoters(true)}
   else if(el.id==="im-file"&&el.files[0])readImport(el.files[0]);
   else if(el.id==="roll-file"&&el.files[0])readRoll(el.files[0]);
