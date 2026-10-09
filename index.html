@@ -66,6 +66,11 @@ header.top{display:flex;align-items:center;gap:10px;padding-block:12px;border-bo
 .bchk small{display:block;color:var(--muted);font-size:.78rem}.blist{max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:0 10px}
 .btags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.btag{font-family:var(--mono);font-size:.74rem;background:var(--sunk);border-radius:6px;padding:1px 6px;color:var(--fg)}
 .sub-members{margin-left:14px;border-left:2px solid var(--line);padding-left:10px}
+.wtag{display:inline-block;font-size:.7rem;font-weight:700;border-radius:999px;padding:1px 8px;margin-right:6px;vertical-align:middle;letter-spacing:.02em}
+.wtag.strong{background:var(--my);color:var(--on-my)}.wtag.close{background:var(--neu);color:var(--on-neu)}.wtag.weak{background:var(--opp);color:var(--on-opp)}.wtag.nodata{background:var(--sunk);color:var(--muted)}
+.quick{display:flex;gap:8px;flex-wrap:wrap}.quick .chip{flex:1 1 150px;text-align:left}
+.req{display:flex;gap:10px;align-items:flex-start;padding-block:9px;border-top:1px solid var(--line);flex-wrap:wrap}.req:first-child{border-top:0}
+.req .grow{flex:1 1 200px;min-width:0;overflow-wrap:anywhere}.req.done .rb{text-decoration:line-through;color:var(--muted)}
 .sugg{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:-6px;background:var(--surface)}
 .sugg button{border:0;border-top:1px solid var(--line);background:none;text-align:left;padding:9px 11px;cursor:pointer;color:var(--fg);font-size:.92rem}
 .sugg button:first-child{border-top:0}.sugg button:hover,.sugg button:focus{background:var(--accent-soft)}.sugg small{display:block;color:var(--muted);font-size:.76rem}
@@ -237,7 +242,9 @@ nav.tabs button[aria-current="page"]{color:var(--accent);font-weight:600}
 "use strict";
 /* ================= strings ================= */
 const T={
-en:{pickVoter:"Type 3 letters — matching names from the voter list appear",fromRoll:"From voter list",noMatch:"Not in the voter list — you can still type the name",
+en:{winMap:"Booth win-map",strong:"Strong",close:"Close",weak:"Weak",nodata:"Too few surveyed",winHint:"Close booths can go either way — send more workers there.",
+ youth:"Youth 18–29",keyPeople:"Key people",keyPerson:"Key person",requests:"Help requests",reqOpen:"Open",reqDone:"Done",reqPh:"What help does this voter need?",addReq:"Add request",markDone:"Mark done",reopen:"Reopen",noReq:"No help requests.",
+ pickVoter:"Type 3 letters — matching names from the voter list appear",fromRoll:"From voter list",noMatch:"Not in the voter list — you can still type the name",
  myBooths:"My booths",boothsLbl:"Booths",noBoothsYet:"No booths yet",assignBooths:"Booths",chooseBooths:"Choose booths",takenBy:"given to",freeBooths:"Booths without a ward leader",freeWorkerBooths:"My booths without a worker",noWorkerYet:"No worker yet",leaderLbl:"Leader",workerLbl:"Worker",myLeader:"My ward leader",
  noBoothsLeader:"No booths have been given to you yet. Ask the MLA.",noBoothsWorker:"No booths have been given to you yet. Ask your ward leader.",surveyed:"Surveyed",remaining:"Remaining",myVoters:"My voters",progress:"Survey progress",
  E_BOOTH_TAKEN:"Already given to someone else — booth",E_BOOTH_WARD:"A ward leader can get booths of his own ward only.",E_BOOTH_NOT_YOURS:"You can give only your own booths.",E_BOOTH_REQUIRED:"Choose a booth.",
@@ -282,7 +289,9 @@ en:{pickVoter:"Type 3 letters — matching names from the voter list appear",fro
  E_WARD_IN_USE:"This ward still has people or voters. Move or remove them first.",E_NET:"No connection. Check your internet and try again.",E_GENERIC:"Something went wrong. Try again.",
  notConfigured:"App not set up yet",notConfiguredB:"Open config.js and paste your Supabase project URL and key, then reload this page.",
  privacy:"Voter details are private campaign data. Do not share screenshots outside the team."},
-kn:{pickVoter:"3 ಅಕ್ಷರ ಬರೆಯಿರಿ — ಮತದಾರರ ಪಟ್ಟಿಯ ಹೆಸರುಗಳು ಕಾಣುತ್ತವೆ",fromRoll:"ಮತದಾರರ ಪಟ್ಟಿಯಿಂದ",noMatch:"ಮತದಾರರ ಪಟ್ಟಿಯಲ್ಲಿ ಇಲ್ಲ — ಹೆಸರನ್ನು ಹಾಗೆಯೇ ಬರೆಯಬಹುದು",
+kn:{winMap:"ಮತಗಟ್ಟೆ ಸ್ಥಿತಿ",strong:"ಬಲಿಷ್ಠ",close:"ಸಮಬಲ",weak:"ದುರ್ಬಲ",nodata:"ಸಮೀಕ್ಷೆ ಕಡಿಮೆ",winHint:"ಸಮಬಲದ ಮತಗಟ್ಟೆಗಳು ಯಾವ ಕಡೆಗೂ ಹೋಗಬಹುದು — ಅಲ್ಲಿ ಹೆಚ್ಚು ಕಾರ್ಯಕರ್ತರನ್ನು ಕಳುಹಿಸಿ.",
+ youth:"ಯುವಕರು 18–29",keyPeople:"ಪ್ರಮುಖ ವ್ಯಕ್ತಿಗಳು",keyPerson:"ಪ್ರಮುಖ ವ್ಯಕ್ತಿ",requests:"ಸಹಾಯ ಮನವಿಗಳು",reqOpen:"ಬಾಕಿ",reqDone:"ಮುಗಿದಿದೆ",reqPh:"ಈ ಮತದಾರರಿಗೆ ಯಾವ ಸಹಾಯ ಬೇಕು?",addReq:"ಮನವಿ ಸೇರಿಸಿ",markDone:"ಮುಗಿದಿದೆ",reopen:"ಮತ್ತೆ ತೆರೆಯಿರಿ",noReq:"ಸಹಾಯ ಮನವಿಗಳಿಲ್ಲ.",
+ pickVoter:"3 ಅಕ್ಷರ ಬರೆಯಿರಿ — ಮತದಾರರ ಪಟ್ಟಿಯ ಹೆಸರುಗಳು ಕಾಣುತ್ತವೆ",fromRoll:"ಮತದಾರರ ಪಟ್ಟಿಯಿಂದ",noMatch:"ಮತದಾರರ ಪಟ್ಟಿಯಲ್ಲಿ ಇಲ್ಲ — ಹೆಸರನ್ನು ಹಾಗೆಯೇ ಬರೆಯಬಹುದು",
  myBooths:"ನನ್ನ ಮತಗಟ್ಟೆಗಳು",boothsLbl:"ಮತಗಟ್ಟೆಗಳು",noBoothsYet:"ಇನ್ನೂ ಮತಗಟ್ಟೆ ಇಲ್ಲ",assignBooths:"ಮತಗಟ್ಟೆಗಳು",chooseBooths:"ಮತಗಟ್ಟೆಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ",takenBy:"ಇವರಿಗೆ ನೀಡಲಾಗಿದೆ",freeBooths:"ವಾರ್ಡ್ ಮುಖಂಡರಿಲ್ಲದ ಮತಗಟ್ಟೆಗಳು",freeWorkerBooths:"ಕಾರ್ಯಕರ್ತರಿಲ್ಲದ ನನ್ನ ಮತಗಟ್ಟೆಗಳು",noWorkerYet:"ಇನ್ನೂ ಕಾರ್ಯಕರ್ತರಿಲ್ಲ",leaderLbl:"ಮುಖಂಡ",workerLbl:"ಕಾರ್ಯಕರ್ತ",myLeader:"ನನ್ನ ವಾರ್ಡ್ ಮುಖಂಡ",
  noBoothsLeader:"ನಿಮಗೆ ಇನ್ನೂ ಮತಗಟ್ಟೆಗಳನ್ನು ನೀಡಿಲ್ಲ. ಶಾಸಕರನ್ನು ಕೇಳಿ.",noBoothsWorker:"ನಿಮಗೆ ಇನ್ನೂ ಮತಗಟ್ಟೆಗಳನ್ನು ನೀಡಿಲ್ಲ. ನಿಮ್ಮ ವಾರ್ಡ್ ಮುಖಂಡರನ್ನು ಕೇಳಿ.",surveyed:"ಸಮೀಕ್ಷೆ ಆಗಿದೆ",remaining:"ಬಾಕಿ",myVoters:"ನನ್ನ ಮತದಾರರು",progress:"ಸಮೀಕ್ಷೆ ಪ್ರಗತಿ",
  E_BOOTH_TAKEN:"ಈಗಾಗಲೇ ಬೇರೆಯವರಿಗೆ ನೀಡಲಾಗಿದೆ — ಮತಗಟ್ಟೆ",E_BOOTH_WARD:"ವಾರ್ಡ್ ಮುಖಂಡರಿಗೆ ಅವರ ವಾರ್ಡ್‌ನ ಮತಗಟ್ಟೆಗಳನ್ನು ಮಾತ್ರ ನೀಡಬಹುದು.",E_BOOTH_NOT_YOURS:"ನಿಮ್ಮ ಮತಗಟ್ಟೆಗಳನ್ನು ಮಾತ್ರ ನೀಡಬಹುದು.",E_BOOTH_REQUIRED:"ಮತಗಟ್ಟೆ ಆಯ್ಕೆಮಾಡಿ.",
@@ -342,7 +351,7 @@ const ICONS={
 /* ================= state & utils ================= */
 const CFG=window.CAMPAIGN_CONFIG||{};
 const S={lang:"kn",tab:"dashboard",sb:null,me:null,wards:[],members:[],issues:[],summary:[],issueSum:[],activity:[],
- cw:"",folds:{},booths:[],boothSum:[],secSum:[],notices:[],turnout:[],daily:[],settings:{},areaSum:[],area:null,aq:"",vmode:"areas",pBooth:"",pFound:null,pSup:[],history:[],offline:false,dashBooth:null,vBooth:"",vSec:"",dashWard:null,vWard:"",q:"",op:"",sort:"roll",voters:[],vCount:0,vLoading:false,armed:null,busy:false};
+ cw:"",folds:{},booths:[],boothSum:[],secSum:[],notices:[],turnout:[],daily:[],settings:{},areaSum:[],area:null,youth:false,key:false,youthSum:null,keyCount:null,requests:[],rqShow:"open",aq:"",vmode:"areas",pBooth:"",pFound:null,pSup:[],history:[],offline:false,dashBooth:null,vBooth:"",vSec:"",dashWard:null,vWard:"",q:"",op:"",sort:"roll",voters:[],vCount:0,vLoading:false,armed:null,busy:false};
 try{const l=localStorage.getItem("cd.lang");if(l==="en"||l==="kn")S.lang=l;const tb=localStorage.getItem("cd.tab");if(tb&&ICONS[tb])S.tab=tb;const vm=localStorage.getItem("cd.vmode");if(vm==="list"||vm==="areas")S.vmode=vm}catch(e){}
 const t=k=>(T[S.lang][k]??T.en[k]??k);
 const L=o=>o?((S.lang==="kn"?(o.kn||o.en):(o.en||o.kn))||""):"";
@@ -458,9 +467,20 @@ async function loadAll(){
   S.settings=Object.fromEntries((st.data||[]).map(x=>[x.key,x.value]));
   for(const r of [w,m,i,s,is,a,bo,bs])if(r.error){toast(errText(r.error));break}
   S.booths=bo.data||[];S.boothSum=bs.data||[];
+  loadExtras();
   S.wards=w.data||[];S.members=m.data||[];S.issues=i.data||[];S.summary=s.data||[];S.issueSum=is.data||[];S.activity=a.data||[];
   cacheSet("cd.base",{wards:S.wards,members:S.members,issues:S.issues,summary:S.summary,issueSum:S.issueSum,activity:S.activity,booths:S.booths,boothSum:S.boothSum,notices:S.notices,turnout:S.turnout,daily:S.daily,settings:S.settings});
   if(isMla()&&S.wards.length){let c=S.cw;if(!wardById(c)){c=sortedWards()[0].id;S.cw=S.vWard=S.dashWard=c;refreshSummarySoon()}}else if(isMla()){S.cw="";S.vWard=S.dashWard=null}
+}
+let exReq=0;
+async function loadExtras(){
+  if(!S.me)return;const my=++exReq;const W=isMla()?(S.cw||null):S.me.ward_id;
+  let kq=S.sb.from("voters").select("id",{count:"exact",head:true}).eq("key_person",true);if(W)kq=kq.eq("ward_id",W);
+  let rq=S.sb.from("requests").select("*,voters(full_name,phone,part_no)").order("created_at",{ascending:false}).limit(150);if(W&&!isWorker())rq=rq.eq("ward_id",W);
+  const [y,k,r]=await Promise.all([S.sb.rpc("youth_summary",{p_ward:W}),kq,rq]);
+  if(my!==exReq)return;
+  S.youthSum=y.error?null:(y.data?.[0]||null);S.keyCount=k.error?null:k.count;S.requests=r.error?[]:(r.data||[]);
+  if(S.tab==="dashboard")render();
 }
 let sumT;
 function refreshSummarySoon(){clearTimeout(sumT);sumT=setTimeout(async()=>{
@@ -470,6 +490,7 @@ function refreshSummarySoon(){clearTimeout(sumT);sumT=setTimeout(async()=>{
   const [dr,tu]=await Promise.all([S.sb.rpc("daily_report",{p_ward:isMla()?(S.cw||null):S.me.ward_id}),S.sb.rpc("turnout_summary",{p_ward:isMla()?null:S.me.ward_id})]);
   if(!dr.error)S.daily=dr.data||[];if(!tu.error)S.turnout=tu.data||[];
   if(S.tab!=="voters")render();
+  loadExtras();
 },700)}
 
 /* ================= chrome ================= */
@@ -525,11 +546,22 @@ function vWorkerDash(){
    <div class="tile"><span><i class="dot unk"></i>${esc(t("remaining"))}</span><b>${num(s.unknown)}</b></div>
   </div>${myTodayBar()}`;
   if(S.booths.length)out+=`<div class="panel"><h3>${esc(t("myBooths"))}</h3>${progRows(S.booths.map(b=>({label:boothLabel(b),s:sumRows(S.boothSum.filter(r=>r.booth_id===b.id))})))}</div>`;
-  out+=`<div class="folds">${fold("notices",t("notices"),noticesInner(),S.notices.length||null)}</div>`;
+  out+=`<div class="folds">${fold("notices",t("notices"),noticesInner(),S.notices.length||null)}${fold("requests",t("requests"),requestsInner(),S.requests.filter(r=>r.status==="open").length||null)}</div>`;
   return out;
 }
+const canDone=r=>isMla()||(isLeader()&&S.booths.some(b=>b.id===r.booth_id&&b.leader_id===S.me.user_id));
+function reqItem(r,withVoter){const by=memberById(r.created_by);const v=r.voters||{};
+  return `<li class="req${r.status==="done"?" done":""}"><div class="grow"><div class="rb"><b>${esc(r.body)}</b></div><div class="m" style="color:var(--muted);font-size:.8rem">${withVoter?`<button type="button" class="btn sm ghost" style="padding:0" data-rqvoter="${esc(r.voter_id)}">${esc(v.full_name||"—")}</button> · ${v.part_no?esc(t("booth"))+" "+v.part_no+" · ":""}`:""}${esc(by?.full_name||"")} · ${esc(fmtTime(r.created_at))}${r.status==="done"&&r.done_at?" · ✓ "+esc(fmtTime(r.done_at)):""}</div></div>
+   <div class="acts">${withVoter&&v.phone?`<button class="btn sm ghost" type="button" data-call="${esc(v.phone)}" aria-label="${esc(t("call"))}">📞</button>`:""}${canDone(r)?(r.status==="open"?`<button class="btn sm" type="button" data-rqdone="${esc(r.id)}">✓ ${esc(t("markDone"))}</button>`:`<button class="btn sm ghost" type="button" data-rqopen="${esc(r.id)}">${esc(t("reopen"))}</button>`):(r.status==="done"?`<span class="role" style="background:var(--ok-soft);color:var(--ok)">✓ ${esc(t("reqDone"))}</span>`:"")}${r.status==="open"&&r.created_by===S.me.user_id&&!canDone(r)?`<button class="btn sm ghost danger" type="button" data-rqdel="${esc(r.id)}">✕</button>`:""}</div></li>`}
+function requestsInner(){
+  const list=S.requests.filter(r=>r.status===S.rqShow);
+  return `<div class="wseg sm" role="tablist">${["open","done"].map(k=>`<button type="button" role="tab" data-rqshow="${k}" aria-selected="${S.rqShow===k}">${esc(t(k==="open"?"reqOpen":"reqDone"))} · ${num(S.requests.filter(r=>r.status===k).length)}</button>`).join("")}</div>
+   ${list.length?`<ul class="mlist">${list.slice(0,50).map(r=>reqItem(r,true)).join("")}</ul>`:`<p class="sub" style="margin:0">${esc(t("noReq"))}</p>`}`;
+}
+function winTag(s){const sv=s.total-s.unknown;if(!s.total||sv<Math.max(10,s.total*.05))return "nodata";const m=(s.my_side-s.opposite)*100/sv;return m>=15?"strong":m<=-15?"weak":"close"}
+const WIN_ORDER={close:0,weak:1,strong:2,nodata:3};
 function opRows(items,attr){
-  return `<ul class="wards">${items.map(it=>`<li><button class="wardrow" type="button" ${attr?`data-${attr}="${esc(it.id)}"`:"disabled"}><span class="wname">${esc(it.label)}</span><span class="wtot">${num(it.s.total)}${it.roll?` / ${num(it.roll)}`:""} ${esc(t("votersN"))}</span>${stack(it.s)}<span class="wpct"><span><b>${esc(t("covered"))} ${coverage(it.s)}%</b></span>${["my_side","neutral","opposite"].map(k=>`<span title="${esc(t(k))}"><i class="dot ${OPCLS[k]}"></i>${pct(it.s[k],it.s.total)}%</span>`).join("")}</span></button></li>`).join("")}</ul>`;
+  return `<ul class="wards">${items.map(it=>`<li><button class="wardrow" type="button" ${attr?`data-${attr}="${esc(it.id)}"`:"disabled"}><span class="wname">${it.tag?`<span class="wtag ${it.tag}">${esc(t(it.tag))}</span>`:""}${esc(it.label)}</span><span class="wtot">${num(it.s.total)}${it.roll?` / ${num(it.roll)}`:""} ${esc(t("votersN"))}</span>${stack(it.s)}<span class="wpct"><span><b>${esc(t("covered"))} ${coverage(it.s)}%</b></span>${["my_side","neutral","opposite"].map(k=>`<span title="${esc(t(k))}"><i class="dot ${OPCLS[k]}"></i>${pct(it.s[k],it.s.total)}%</span>`).join("")}</span></button></li>`).join("")}</ul>`;
 }
 function vDashboard(){
   if(isWorker())return vWorkerDash();
@@ -546,9 +578,16 @@ function vDashboard(){
    ${["my_side","neutral","opposite"].map(k=>`<div class="tile"><span><i class="dot ${OPCLS[k]}"></i>${esc(t(k))}</span><b>${pct(s[k],s.total)}%</b><small>${num(s[k])}</small></div>`).join("")}
   </div>`;
   if(!B)out+=myTodayBar();
+  if(!B&&(S.youthSum||S.keyCount!=null)){const y=S.youthSum;out+=`<div class="quick">${y?`<button class="chip" type="button" data-goto="youth">🧑 <b>${esc(t("youth"))}</b>: ${num(y.total)}<span class="n">${esc(t("my_side"))} ${pct(y.my_side,y.total)}% · ${esc(t("covered"))} ${coverage(y)}%</span></button>`:""}${S.keyCount!=null?`<button class="chip" type="button" data-goto="key">⭐ <b>${esc(t("keyPeople"))}</b>: ${num(S.keyCount)}</button>`:""}</div>`}
   if(!B){
     const bs=boothsIn(W);
-    if(bs.length)out+=`<div class="panel"><div><h3>${esc(t("byBooth"))}</h3><p class="sub">${esc(t("tapBooth"))}</p></div>${opRows(bs.map(x=>({id:x.id,label:boothLabel(x),s:sumRows(S.boothSum.filter(r=>r.booth_id===x.id)),roll:x.roll_total,sub:x.polling_station})),"dbooth")}</div>`;
+    if(bs.length){
+      const items=bs.map(x=>{const s2=sumRows(S.boothSum.filter(r=>r.booth_id===x.id));return {id:x.id,label:boothLabel(x),s:s2,roll:x.roll_total,tag:winTag(s2),pn:x.part_no}}).sort((a,b)=>WIN_ORDER[a.tag]-WIN_ORDER[b.tag]||a.pn-b.pn);
+      const cnt=k=>items.filter(i=>i.tag===k).length;
+      out+=`<div class="panel"><div><h3>${esc(t("winMap"))}</h3><p class="sub">${esc(t("winHint"))}</p></div>
+      <div class="chips">${["strong","close","weak","nodata"].filter(cnt).map(k=>`<span class="chip" style="cursor:default"><span class="wtag ${k}">${esc(t(k))}</span>${num(cnt(k))}</span>`).join("")}</div>
+      ${opRows(items,"dbooth")}</div>`;
+    }
   }else{
     const rows=[...S.secSum].sort((a,b)=>(a.section_no||0)-(b.section_no||0));
     if(rows.length)out+=`<div class="panel"><h3>${esc(t("byLane"))}</h3>${opRows(rows.map(r=>({id:r.section_no,label:`${r.section_no||"–"}. ${secName(bo,r.section_no)}`,s:sumRows([r])})),"")}</div>`;
@@ -556,6 +595,7 @@ function vDashboard(){
   // everything else folds away
   const folds=[];
   if(!B)folds.push(fold("notices",t("notices"),noticesInner(),S.notices.length||null));
+  if(!B)folds.push(fold("requests",t("requests"),requestsInner(),S.requests.filter(r=>r.status==="open").length||null));
   folds.push(fold("chart",t("opinion"),`<div class="donut-wrap">${donut(s)}${legend(s)}</div>`));
   if(canManageVoters()&&!B)folds.push(fold("report",t("dailyReport"),reportInner()));
   const isum=[...S.issueSum].map(r=>({l:L(S.issues.find(i=>i.id===r.issue_id))||"—",n:Number(r.n)})).sort((a,b)=>b.n-a.n).slice(0,10);const maxI=isum[0]?.n||0;
@@ -585,7 +625,7 @@ const natKey=x=>String(x||"").toLowerCase().split(/(\d+)/).map(p=>/^\d+$/.test(p
 const houseCmp=(a,b)=>(a.house_no?0:1)-(b.house_no?0:1)||natKey(a.house_no).localeCompare(natKey(b.house_no))||(a.part_no||0)-(b.part_no||0)||(a.serial_no||0)-(b.serial_no||0);
 const psText=b=>b?`${t("booth")} ${b.part_no} · ${b.polling_station||b.place||""}`:"";
 const mapUrl=b=>"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent([b.polling_station||b.ps_address||"",b.place||"",CFG.CONSTITUENCY_EN||"","Belagavi, Karnataka"].filter(Boolean).join(", "));
-function psBox(b,serial){if(!b)return "";return `<div class="ps-box"><span aria-hidden="true">🏫</span><div class="grow"><b>${esc(t("polling"))}</b><br>${esc(psText(b))}${serial?` · ${esc(t("serial"))} ${serial}`:""}</div><button class="btn sm fit" type="button" data-map="${esc(b.id)}">📍 ${esc(t("openMap"))}</button></div>`}
+function psBox(b,serial){if(!b)return "";return `<div class="ps-box"><span aria-hidden="true">🏫</span><div class="grow"><b>${esc(t("polling"))}</b><br>${esc(psText(b))}${serial?` · ${esc(t("serial"))} ${serial}`:""}</div></div>`}
 function modeSeg(){return `<div class="wseg sm" role="tablist">${[["areas","areasTab"],["list","listTab"]].map(([k,l])=>`<button type="button" role="tab" data-vmode="${k}" aria-selected="${S.vmode===k}">${esc(t(l))}</button>`).join("")}</div>`}
 function areaMeta(a){return `${t("booth")} ${a.booths.join(", ")}${a.hn.length?" · "+t("hno")+" "+a.hn.join(" · "):""}`}
 function vAreas(list){
@@ -631,10 +671,10 @@ function vVoters(){
     const b=v.booth_id?boothById(v.booth_id):null;
     const meta=[v.serial_no?`${t("serial")} ${v.serial_no}`:"",!S.vBooth&&b&&!oneBooth?`${t("booth")} ${b.part_no}`:"",v.house_no&&!grouped?`${t("houseN")} ${v.house_no}`:"",[v.age||"",v.gender?(S.lang==="en"?t(v.gender)[0]:t(v.gender)):""].filter(Boolean).join(" "),v.relative_name?relLine(v):""].filter(Boolean).join(" · ");
     const psLine=S.q.trim()&&b?`<span class="v-ps">🏫 ${esc(t("whereVote"))}: ${esc(psText(b))}</span>`:"";
-    parts.push(`<li class="voter"><button class="v-main" type="button" data-vedit="${esc(v.id)}"><span class="v-name">${esc(v.full_name)}${v.voted?` <span class="voted">✓</span>`:""}</span><span class="v-meta">${esc(meta)||"&nbsp;"}</span>${psLine}</button>${v.phone?`<button class="btn sm ghost" type="button" data-call="${esc(v.phone)}" aria-label="${esc(t("call"))}">📞</button>`:""}
+    parts.push(`<li class="voter"><button class="v-main" type="button" data-vedit="${esc(v.id)}"><span class="v-name">${v.key_person?"⭐ ":""}${esc(v.full_name)}${v.voted?` <span class="voted">✓</span>`:""}</span><span class="v-meta">${esc(meta)||"&nbsp;"}</span>${psLine}</button>${v.phone?`<button class="btn sm ghost" type="button" data-call="${esc(v.phone)}" aria-label="${esc(t("call"))}">📞</button>`:""}
      <div class="opseg" role="group" aria-label="${esc(t("opinion"))}">${["my_side","neutral","opposite"].map(o=>`<button type="button" data-vop="${esc(v.id)}" data-op="${o}" aria-pressed="${v.opinion===o}">${esc(t(o))}</button>`).join("")}</div></li>`);
   });
-  const filtered=S.q||S.op||S.vSec;
+  const filtered=S.q||S.op||S.vSec||S.youth||S.key;
   const bopts=boothsIn(W);
   const head=A?`<div><button class="btn sm ghost" type="button" id="a-back" style="padding-left:0">← ${esc(t("allAreas"))}</button><h2>${esc(A.lane)}</h2><p class="sub" style="overflow-wrap:anywhere">${esc(areaMeta(A))}</p>${[...new Set(A.parts.map(p=>p[0]))].map(id=>`<p class="v-ps" style="font-size:.84rem">🏫 ${esc(psText(boothById(id)))}</p>`).join("")}</div>`:(areas.length?modeSeg():"");
   return `${wardSwitch()}${noBoothsNote()}${head}
@@ -645,7 +685,7 @@ function vVoters(){
     ${bo&&(bo.sections||[]).length?`<select id="v-sec" aria-label="${esc(t("lane"))}"><option value="">${esc(t("allLanes"))}</option>${bo.sections.map(x=>`<option value="${x.no}" ${String(x.no)===String(S.vSec)?"selected":""}>${x.no}. ${esc(secName(bo,x.no))}</option>`).join("")}</select>`:""}
     <select id="v-sort" aria-label="${esc(t("sort"))}" style="flex:0 1 150px">${[["roll","sortRoll"],["name","sortName"],["house","sortHouse"],["recent","sortRecent"]].map(([k,l])=>`<option value="${k}" ${S.sort===k?"selected":""}>${esc(t(l))}</option>`).join("")}</select>
    </div>`}
-   <div class="chips">${isWorker()?[["unknown","remaining","unk",counts.unknown],["done","surveyed","my",s.total-s.unknown]].map(([o,l,c,n])=>`<button type="button" class="chip" data-vfilter="${o}" aria-pressed="${S.op===o}"><i class="dot ${c}"></i> ${esc(t(l))}<span class="n">${num(n)}</span></button>`).join(""):OPS.map(o=>`<button type="button" class="chip" data-vfilter="${o}" aria-pressed="${S.op===o}"><i class="dot ${OPCLS[o]}"></i> ${esc(t(o))}<span class="n">${num(counts[o])}</span></button>`).join("")}</div>
+   <div class="chips">${isWorker()?[["unknown","remaining","unk",counts.unknown],["done","surveyed","my",s.total-s.unknown]].map(([o,l,c,n])=>`<button type="button" class="chip" data-vfilter="${o}" aria-pressed="${S.op===o}"><i class="dot ${c}"></i> ${esc(t(l))}<span class="n">${num(n)}</span></button>`).join(""):OPS.map(o=>`<button type="button" class="chip" data-vfilter="${o}" aria-pressed="${S.op===o}"><i class="dot ${OPCLS[o]}"></i> ${esc(t(o))}<span class="n">${num(counts[o])}</span></button>`).join("")}<button type="button" class="chip" data-vtog="youth" aria-pressed="${S.youth}">🧑 18–29</button><button type="button" class="chip" data-vtog="key" aria-pressed="${S.key}">⭐ ${esc(t("keyPeople"))}</button></div>
   </div>
   <div class="listhead"><span class="sub">${num(S.vCount)} ${esc(t("votersN"))}${A&&nHouses?` · ${num(nHouses)} ${esc(t("houses"))} · ${num(nDone)} ${esc(t("housesDone"))}`:""}${S.voters.length<S.vCount?" · "+num(S.voters.length)+" "+esc(t("shown")):""}</span><button class="btn primary sm" type="button" id="v-add">+ ${esc(t("addVoter"))}</button></div>
   <div class="panel tight">${S.vLoading&&!S.voters.length?`<div class="empty"><div class="spin"></div></div>`:S.voters.length?`<ul class="vlist">${parts.join("")}</ul>${S.voters.length<S.vCount?`<button class="btn" type="button" id="v-more" ${S.vLoading?"disabled":""}>${esc(t("showMore"))}</button>`:""}`:
@@ -659,6 +699,8 @@ function voterQuery(sel,opts){
   else if(S.vBooth)q=q.eq("booth_id",S.vBooth);else if(W)q=q.eq("ward_id",W);
   if(!A&&S.vBooth&&S.vSec)q=q.eq("section_no",Number(S.vSec));
   if(S.op==="done")q=q.neq("opinion","unknown");else if(S.op)q=q.eq("opinion",S.op);
+  if(S.youth)q=q.gte("age",18).lte("age",29);
+  if(S.key)q=q.eq("key_person",true);
   const term=S.q.trim().replace(/[,()%*\\"':]/g," ").replace(/\s+/g," ").trim();
   if(term){const p=`%${term}%`;
     if(/^\d{1,4}$/.test(term))q=q.or(`serial_no.eq.${term},house_no.ilike.${term},house_no.ilike.${term}/%`);
@@ -683,7 +725,7 @@ async function loadVoters(reset){
   if(my!==vReq)return;
   if(error&&!S.noPartNo&&/part_no/.test(error.message||"")){S.noPartNo=true;return loadVoters(reset)}  // database not yet updated
   S.vLoading=false;
-  const ck="cd.v:"+[S.cw||S.vWard,S.vBooth,S.vSec,S.op,S.q,S.sort].join("|");
+  const ck="cd.v:"+[S.cw||S.vWard,S.vBooth,S.vSec,S.op,S.q,S.sort,S.youth?1:0,S.key?1:0].join("|");
   if(error&&isNet(error)){const c=cacheGet(ck);if(c&&reset){S.voters=c.voters;S.vCount=c.count;S.offline=true;applyQueue(S.voters);render();toast(t("offlineList"));return}}
   if(error){toast(errText(error));render();return}
   S.offline=false;
@@ -698,7 +740,7 @@ async function loadArea(){
   const all=[];let err=null;const PN=S.noPartNo?"booth_id":"part_no";
   for(let from=0;from<6000;from+=1000){const {data,error}=await voterQuery("*").order(PN,{nullsFirst:false}).order("serial_no",{nullsFirst:false}).order("id").range(from,from+999);
     if(my!==vReq)return;if(error){err=error;break}all.push(...data);if(data.length<1000)break}
-  S.vLoading=false;const ck="cd.a:"+[S.cw||S.vWard,S.area?.key,S.op,S.q].join("|");
+  S.vLoading=false;const ck="cd.a:"+[S.cw||S.vWard,S.area?.key,S.op,S.q,S.youth?1:0,S.key?1:0].join("|");
   if(err&&isNet(err)){const c=cacheGet(ck);if(c){S.voters=c.voters;S.vCount=c.voters.length;S.offline=true;applyQueue(S.voters);render();toast(t("offlineList"));return}}
   if(err){toast(errText(err));render();return}
   all.sort(houseCmp);S.offline=false;S.voters=all;S.vCount=all.length;applyQueue(S.voters);cacheSet(ck,{voters:all},true);
@@ -756,14 +798,17 @@ function openVoter(v){
    </div>
    <label style="display:flex;gap:8px;align-items:flex-start;font-size:.88rem"><input type="checkbox" id="vf-consent" ${v.consent?"checked":""} style="margin-top:4px">${esc(t("consent"))}</label>
    <p class="sub" style="margin:-8px 0 0;font-size:.8rem">${esc(t("consentNote"))}</p>
+   <div class="chips"><button type="button" class="chip" id="vf-key" aria-pressed="${!!v.key_person}">⭐ ${esc(t("keyPerson"))}</button></div>
    <label class="f">${esc(t("notes"))}<textarea id="vf-notes">${esc(v.notes||"")}</textarea></label>
    ${by?`<p class="sub" style="margin:0;font-size:.8rem">${esc(t("lastBy"))}: ${esc(by.full_name)} · ${new Date(v.updated_at).toLocaleString(S.lang==="kn"?"kn-IN":"en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"})}</p>`:""}
    ${!isNew?`<div class="row" style="justify-content:flex-start"><button class="btn sm fit" type="button" id="vf-slip">${esc(t("shareSlip"))}</button>${v.phone?`<button class="btn sm fit" type="button" data-call="${esc(v.phone)}">📞 ${esc(t("call"))}</button>`:""}</div>
+   <div><h3 style="font-size:.95rem;margin-bottom:4px">${esc(t("requests"))}</h3><div id="vf-req"></div>
+    <div class="row" style="margin-top:6px"><input type="text" id="rq-body" maxlength="300" placeholder="${esc(t("reqPh"))}"><button class="btn sm fit" type="button" id="rq-add" data-id="${esc(v.id)}">+ ${esc(t("addReq"))}</button></div></div>
    <div><h3 style="font-size:.95rem;margin-bottom:4px">${esc(t("history"))}</h3><div id="vf-hist"><div class="spin"></div></div></div>`:""}
    <div id="vf-err"></div>
    <div class="row"><span style="flex:1 1 0"></span>${!isNew&&canManageVoters()?`<button class="btn danger fit" type="button" id="vf-del" data-id="${esc(v.id)}">${esc(t("del"))}</button>`:""}<button class="btn primary fit" type="button" id="vf-save" data-id="${esc(v.id||"")}">${esc(t("save"))}</button></div>`);
   setTimeout(()=>{if(isNew)$("vf-name")?.focus()},50);
-  S.sheetVoter=isNew?null:v;if(!isNew)loadHistory(v.id);
+  S.sheetVoter=isNew?null:v;if(!isNew){loadHistory(v.id);loadVoterReqs(v.id)}
 }
 function picked(container){const el=$(container)?.querySelector('[aria-pressed="true"]');return el?el.dataset.pick:null}
 async function saveVoter(id){
@@ -771,7 +816,7 @@ async function saveVoter(id){
   const age=parseInt($("vf-age").value);
   const body={full_name:name,house_no:$("vf-house").value.trim()||null,age:age>=18&&age<=125?age:null,gender:picked("vf-gender"),
    opinion:picked("vf-op")||"unknown",issues:[...$("vf-issues").querySelectorAll('[aria-pressed="true"]')].map(b=>b.dataset.multi),
-   epic_no:$("vf-epic").value.trim().toUpperCase()||null,phone:$("vf-phone").value.trim()||null,consent:$("vf-consent").checked,notes:$("vf-notes").value.trim()||null};
+   epic_no:$("vf-epic").value.trim().toUpperCase()||null,phone:$("vf-phone").value.trim()||null,consent:$("vf-consent").checked,key_person:$("vf-key")?.getAttribute("aria-pressed")==="true",notes:$("vf-notes").value.trim()||null};
   body.ward_id=isMla()&&$("vf-ward")?$("vf-ward").value:(S.voters.find(x=>x.id===id)?.ward_id||S.me.ward_id);
   if($("vf-booth")){body.booth_id=$("vf-booth").value||null;const sv=$("vf-sec")?.value;body.section_no=body.booth_id&&sv?Number(sv):null}
   if(!isMla()&&!id&&!body.booth_id){$("vf-err").innerHTML=`<div class="note bad">${esc(t("E_BOOTH_REQUIRED"))}</div>`;return}
@@ -1214,7 +1259,23 @@ async function setVoted(id,v){
 /* ================= voter slip & history ================= */
 function slipText(v){const b=boothById(v.booth_id)||{};
   return [`*${t("slipTitle")}*`,`${t("fullName")}: ${v.full_name}`,v.relative_name?relLine(v):"",v.epic_no?`${t("epic")}: ${v.epic_no}`:"",
-    b.part_no?`${t("booth")}: ${b.part_no}`:"",b.polling_station?`${t("polling")}: ${b.polling_station}`:"",v.serial_no?`${t("serial")}: ${v.serial_no}`:"",b.id?`📍 ${mapUrl(b)}`:"",v.house_no?`${t("houseNo")}: ${v.house_no}`:""].filter(Boolean).join("\n")}
+    b.part_no?`${t("booth")}: ${b.part_no}`:"",b.polling_station?`${t("polling")}: ${b.polling_station}`:"",v.serial_no?`${t("serial")}: ${v.serial_no}`:"",v.house_no?`${t("houseNo")}: ${v.house_no}`:""].filter(Boolean).join("\n")}
+async function loadVoterReqs(id){
+  const {data,error}=await S.sb.from("requests").select("*").eq("voter_id",id).order("created_at",{ascending:false});
+  const box=$("vf-req");if(!box||error)return;
+  box.innerHTML=(data||[]).length?`<ul class="mlist">${data.map(r=>reqItem(r,false)).join("")}</ul>`:"";
+}
+async function addRequest(btn){
+  const body=$("rq-body").value.trim();if(!body)return;btn.disabled=true;
+  const {error}=await S.sb.from("requests").insert({voter_id:btn.dataset.id,body});btn.disabled=false;
+  if(error){toast(errText(error));return}
+  $("rq-body").value="";toast(t("saved"));loadVoterReqs(btn.dataset.id);loadExtras();
+}
+async function setRequest(id,status){
+  const {error}=await S.sb.from("requests").update({status}).eq("id",id);
+  if(error){toast(errText(error));return}
+  toast(t("saved"));if(S.sheetVoter&&$("vf-req"))loadVoterReqs(S.sheetVoter.id);await loadExtras();render();
+}
 async function loadHistory(id){
   const box=$("vf-hist");if(!box)return;
   const {data,error}=await S.sb.from("voter_history").select("*").eq("voter_id",id).order("changed_at",{ascending:false}).limit(10);
@@ -1247,14 +1308,13 @@ function closeSheet(){$("sheetbg").hidden=true;$("sheet").innerHTML="";S.armed=n
 
 /* ================= events ================= */
 document.addEventListener("submit",ev=>{if(ev.target.id==="loginForm"){ev.preventDefault();doLogin()}if(ev.target.id==="p-form"){ev.preventDefault();findSerial()}});
-document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&!$("sheetbg").hidden)closeSheet()});
+document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&!$("sheetbg").hidden)closeSheet();if(ev.key==="Enter"&&ev.target.id==="rq-body"){ev.preventDefault();$("rq-add")?.click()}});
 $("sheetbg").addEventListener("click",ev=>{if(ev.target.id==="sheetbg")closeSheet()});
 document.addEventListener("click",async ev=>{
   const b=ev.target.closest("button");if(!b)return;const d=b.dataset;
   if(d.lang){S.lang=d.lang;store("cd.lang",S.lang);S.me?render():(configured?viewLogin():viewNotConfigured());return}
   if("close" in d){closeSheet();return}
   if(d.tab){S.tab=d.tab;S.armed=null;store("cd.tab",S.tab);render();window.scrollTo(0,0);if(S.tab==="voters")loadVoters(true);if(S.tab==="polling"){S.pFound=null;loadPolling()}return}
-  if(d.map){const b=boothById(d.map);if(b)openExternal(mapUrl(b));return}
   if(d.call){openExternal("tel:"+d.call.replace(/[^\d+]/g,""));return}
   if(d.pvote){setVoted(d.pvote,d.v==="1");return}
   if(d.ndel){if(S.armed!=="n:"+d.ndel){S.armed="n:"+d.ndel;render();return}S.armed=null;const {error}=await S.sb.from("notices").delete().eq("id",d.ndel);if(error){toast(errText(error));return}S.notices=S.notices.filter(n=>n.id!==d.ndel);render();return}
@@ -1296,6 +1356,15 @@ document.addEventListener("click",async ev=>{
   if(b.id==="wf-save"){saveWard(d.id);return}
   if(d.wdel){if(S.armed!=="w:"+d.wdel){S.armed="w:"+d.wdel;render();return}S.armed=null;const {error}=await S.sb.from("wards").delete().eq("id",d.wdel);if(error){toast(errText(error));render();return}S.wards=S.wards.filter(w=>w.id!==d.wdel);if(S.cw===d.wdel){S.cw="";const f=sortedWards()[0];if(f){S.cw=S.vWard=S.dashWard=f.id;store("cd.ward",f.id)}else{S.vWard="";S.dashWard=null}}render();return}
   if(d.addm){openMember(d.addm,d.w,null);return}
+  if(b.id==="vf-key"){b.setAttribute("aria-pressed",String(b.getAttribute("aria-pressed")!=="true"));return}
+  if(d.vtog){S[d.vtog]=!S[d.vtog];loadVoters(true);return}
+  if(d.goto){S.tab="voters";store("cd.tab","voters");S.vmode="list";S.area=null;S.op="";S.q="";S.youth=d.goto==="youth";S.key=d.goto==="key";render();window.scrollTo(0,0);loadVoters(true);return}
+  if(d.rqshow){S.rqShow=d.rqshow;render();return}
+  if(b.id==="rq-add"){addRequest(b);return}
+  if(d.rqdone){setRequest(d.rqdone,"done");return}
+  if(d.rqopen){setRequest(d.rqopen,"open");return}
+  if(d.rqdel){const {error}=await S.sb.from("requests").delete().eq("id",d.rqdel);if(error){toast(errText(error));return}toast(t("deleted"));if(S.sheetVoter&&$("vf-req"))loadVoterReqs(S.sheetVoter.id);await loadExtras();render();return}
+  if(d.rqvoter){const {data}=await S.sb.from("voters").select("*").eq("id",d.rqvoter).maybeSingle();if(data)openVoter(data);return}
   if(d.msugg!=null){pickSuggest(Number(d.msugg));return}
   if(d.mbooths){openBooths(memberById(d.mbooths));return}
   if(b.id==="bp-save"){saveBooths(b);return}
