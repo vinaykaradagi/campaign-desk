@@ -61,6 +61,11 @@ header.top{display:flex;align-items:center;gap:10px;padding-block:12px;border-bo
 .v-ps{display:block;font-size:.78rem;color:var(--accent);overflow-wrap:anywhere;line-height:1.35;margin-top:2px}
 .ps-box{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:10px 12px;background:var(--surface)}
 .ps-box .grow{flex:1;min-width:0;overflow-wrap:anywhere}
+.bchk{display:flex;gap:10px;align-items:flex-start;padding:9px 4px;border-top:1px solid var(--line);font-size:.9rem;cursor:pointer}
+.bchk:first-child{border-top:0}.bchk input{margin-top:3px;width:18px;height:18px;flex:none}.bchk.taken{color:var(--muted);cursor:not-allowed}
+.bchk small{display:block;color:var(--muted);font-size:.78rem}.blist{max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:0 10px}
+.btags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.btag{font-family:var(--mono);font-size:.74rem;background:var(--sunk);border-radius:6px;padding:1px 6px;color:var(--fg)}
+.sub-members{margin-left:14px;border-left:2px solid var(--line);padding-left:10px}
 .wseg.sm{padding:3px}.wseg.sm button{padding:7px 6px;font-size:.88rem}
 .house.done{background:var(--ok-soft)} .house .tick{color:var(--ok);font-weight:700}
 .area-hn{grid-column:1/-1;color:var(--muted);font-size:.78rem;line-height:1.35;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -229,7 +234,10 @@ nav.tabs button[aria-current="page"]{color:var(--accent);font-weight:600}
 "use strict";
 /* ================= strings ================= */
 const T={
-en:{openMap:"Open in Maps",whereVote:"Votes at",
+en:{myBooths:"My booths",boothsLbl:"Booths",noBoothsYet:"No booths yet",assignBooths:"Booths",chooseBooths:"Choose booths",takenBy:"given to",freeBooths:"Booths without a ward leader",freeWorkerBooths:"My booths without a worker",noWorkerYet:"No worker yet",leaderLbl:"Leader",workerLbl:"Worker",myLeader:"My ward leader",
+ noBoothsLeader:"No booths have been given to you yet. Ask the MLA.",noBoothsWorker:"No booths have been given to you yet. Ask your ward leader.",surveyed:"Surveyed",remaining:"Remaining",myVoters:"My voters",progress:"Survey progress",
+ E_BOOTH_TAKEN:"Already given to someone else — booth",E_BOOTH_WARD:"A ward leader can get booths of his own ward only.",E_BOOTH_NOT_YOURS:"You can give only your own booths.",E_BOOTH_REQUIRED:"Choose a booth.",
+ openMap:"Open in Maps",whereVote:"Votes at",
  areasTab:"Areas / lanes",listTab:"All voters",findArea:"Find lane, area or house no.",areasN:"areas",tapArea:"Tap an area to see its houses in order.",allAreas:"All areas",hno:"H.No.",houses:"houses",housesDone:"done",noAreas:"No lane list from the electoral roll for this ward.",
  app:"Saundatti Constituency Survey",tools:"Settings & tools",party:"Saundatti Youth Party",
  polling_tab:"Polling day",notices:"Notice board",postNotice:"Post notice",noticePh:"Write a message for your team…",everyone:"Everyone",noNotices:"No notices yet.",posted:"Posted",
@@ -270,7 +278,10 @@ en:{openMap:"Open in Maps",whereVote:"Votes at",
  E_WARD_IN_USE:"This ward still has people or voters. Move or remove them first.",E_NET:"No connection. Check your internet and try again.",E_GENERIC:"Something went wrong. Try again.",
  notConfigured:"App not set up yet",notConfiguredB:"Open config.js and paste your Supabase project URL and key, then reload this page.",
  privacy:"Voter details are private campaign data. Do not share screenshots outside the team."},
-kn:{openMap:"ನಕ್ಷೆಯಲ್ಲಿ ನೋಡಿ",whereVote:"ಮತ ಹಾಕುವ ಸ್ಥಳ",
+kn:{myBooths:"ನನ್ನ ಮತಗಟ್ಟೆಗಳು",boothsLbl:"ಮತಗಟ್ಟೆಗಳು",noBoothsYet:"ಇನ್ನೂ ಮತಗಟ್ಟೆ ಇಲ್ಲ",assignBooths:"ಮತಗಟ್ಟೆಗಳು",chooseBooths:"ಮತಗಟ್ಟೆಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ",takenBy:"ಇವರಿಗೆ ನೀಡಲಾಗಿದೆ",freeBooths:"ವಾರ್ಡ್ ಮುಖಂಡರಿಲ್ಲದ ಮತಗಟ್ಟೆಗಳು",freeWorkerBooths:"ಕಾರ್ಯಕರ್ತರಿಲ್ಲದ ನನ್ನ ಮತಗಟ್ಟೆಗಳು",noWorkerYet:"ಇನ್ನೂ ಕಾರ್ಯಕರ್ತರಿಲ್ಲ",leaderLbl:"ಮುಖಂಡ",workerLbl:"ಕಾರ್ಯಕರ್ತ",myLeader:"ನನ್ನ ವಾರ್ಡ್ ಮುಖಂಡ",
+ noBoothsLeader:"ನಿಮಗೆ ಇನ್ನೂ ಮತಗಟ್ಟೆಗಳನ್ನು ನೀಡಿಲ್ಲ. ಶಾಸಕರನ್ನು ಕೇಳಿ.",noBoothsWorker:"ನಿಮಗೆ ಇನ್ನೂ ಮತಗಟ್ಟೆಗಳನ್ನು ನೀಡಿಲ್ಲ. ನಿಮ್ಮ ವಾರ್ಡ್ ಮುಖಂಡರನ್ನು ಕೇಳಿ.",surveyed:"ಸಮೀಕ್ಷೆ ಆಗಿದೆ",remaining:"ಬಾಕಿ",myVoters:"ನನ್ನ ಮತದಾರರು",progress:"ಸಮೀಕ್ಷೆ ಪ್ರಗತಿ",
+ E_BOOTH_TAKEN:"ಈಗಾಗಲೇ ಬೇರೆಯವರಿಗೆ ನೀಡಲಾಗಿದೆ — ಮತಗಟ್ಟೆ",E_BOOTH_WARD:"ವಾರ್ಡ್ ಮುಖಂಡರಿಗೆ ಅವರ ವಾರ್ಡ್‌ನ ಮತಗಟ್ಟೆಗಳನ್ನು ಮಾತ್ರ ನೀಡಬಹುದು.",E_BOOTH_NOT_YOURS:"ನಿಮ್ಮ ಮತಗಟ್ಟೆಗಳನ್ನು ಮಾತ್ರ ನೀಡಬಹುದು.",E_BOOTH_REQUIRED:"ಮತಗಟ್ಟೆ ಆಯ್ಕೆಮಾಡಿ.",
+ openMap:"ನಕ್ಷೆಯಲ್ಲಿ ನೋಡಿ",whereVote:"ಮತ ಹಾಕುವ ಸ್ಥಳ",
  areasTab:"ಓಣಿ / ಪ್ರದೇಶ",listTab:"ಎಲ್ಲಾ ಮತದಾರರು",findArea:"ಓಣಿ, ಪ್ರದೇಶ ಅಥವಾ ಮನೆ ಸಂಖ್ಯೆ ಹುಡುಕಿ",areasN:"ಪ್ರದೇಶಗಳು",tapArea:"ಮನೆಗಳನ್ನು ಕ್ರಮವಾಗಿ ನೋಡಲು ಪ್ರದೇಶದ ಮೇಲೆ ಒತ್ತಿ.",allAreas:"ಎಲ್ಲಾ ಪ್ರದೇಶಗಳು",hno:"ಮನೆ ಸಂ.",houses:"ಮನೆಗಳು",housesDone:"ಮುಗಿದಿದೆ",noAreas:"ಈ ವಾರ್ಡ್‌ಗೆ ಮತದಾರರ ಪಟ್ಟಿಯ ಓಣಿ ವಿವರ ಇಲ್ಲ.",
  app:"ಸವದತ್ತಿ ಕ್ಷೇತ್ರ ಸಮೀಕ್ಷೆ",tools:"ಸೆಟ್ಟಿಂಗ್ಸ್ ಮತ್ತು ಉಪಕರಣಗಳು",party:"ಸವದತ್ತಿ ಯುವ ಪಕ್ಷ",
  polling_tab:"ಮತದಾನ ದಿನ",notices:"ಸೂಚನಾ ಫಲಕ",postNotice:"ಸೂಚನೆ ಹಾಕಿ",noticePh:"ತಂಡಕ್ಕೆ ಸಂದೇಶ ಬರೆಯಿರಿ…",everyone:"ಎಲ್ಲರಿಗೂ",noNotices:"ಇನ್ನೂ ಸೂಚನೆಗಳಿಲ್ಲ.",posted:"ಹಾಕಲಾಗಿದೆ",
@@ -339,6 +350,8 @@ function toast(msg){const el=$("toast");el.textContent=msg;el.hidden=false;clear
 function errText(e){
   const m=String(e?.message||e||"");
   for(const c of ["LOGIN_TAKEN","LOGIN_FORMAT","PASSWORD_SHORT","NOT_ALLOWED","WARD_REQUIRED","NAME_REQUIRED"])if(m.includes(c))return t("E_"+c);
+  const bt=m.match(/BOOTH_TAKEN:\s*([\d, ]+)/);if(bt)return `${t("E_BOOTH_TAKEN")} ${bt[1].trim()}`;
+  for(const c of ["BOOTH_WARD","BOOTH_NOT_YOURS"])if(m.includes(c))return t("E_"+c);
   if(/epic_no/.test(m))return t("E_EPIC");
   if(/foreign key/.test(m))return t("E_WARD_IN_USE");
   if(/row-level security|permission denied/i.test(m))return t("E_NOT_ALLOWED");
@@ -360,8 +373,12 @@ function fold(id,title,inner,count){return `<details class="fold" data-fold="${i
 function sumRows(rows){const o={total:0,my_side:0,neutral:0,opposite:0,unknown:0};for(const r of rows)for(const k in o)o[k]+=Number(r[k])||0;return o}
 const isMla=()=>S.me?.role==="mla";
 const isLeader=()=>S.me?.role==="ward_leader";
+const isWorker=()=>S.me?.role==="worker";
+const boothsOf=m=>S.booths.filter(b=>m.role==="ward_leader"?b.leader_id===m.user_id:b.worker_id===m.user_id);
+const canAssign=m=>m&&m.active&&((isMla()&&m.role==="ward_leader")||(isLeader()&&m.role==="worker"&&m.leader_id===S.me.user_id));
+const noBoothsNote=()=>(!isMla()&&!S.booths.length)?`<div class="note warn">${esc(t(isLeader()?"noBoothsLeader":"noBoothsWorker"))}</div>`:"";
 const canManageVoters=()=>isMla()||isLeader();
-function canManage(m){return m&&m.user_id!==S.me.user_id&&m.role!=="mla"&&(isMla()||(isLeader()&&m.role==="worker"&&m.ward_id===S.me.ward_id))}
+function canManage(m){return m&&m.user_id!==S.me.user_id&&m.role!=="mla"&&(isMla()||(isLeader()&&m.role==="worker"&&m.leader_id===S.me.user_id))}
 const sortedWards=()=>[...S.wards].sort((a,b)=>(parseInt(a.number)||1e9)-(parseInt(b.number)||1e9)||String(a.number||"").localeCompare(String(b.number||""))||a.name.localeCompare(b.name));
 function genPw(){const a="abcdefghjkmnpqrstuvwxyz23456789";let s="";const r=crypto.getRandomValues(new Uint32Array(8));for(const x of r)s+=a[x%a.length];return s}
 async function copyText(txt){if(window.AndroidBridge){AndroidBridge.copyText(txt);toast(t("copied"));return}try{await navigator.clipboard.writeText(txt);toast(t("copied"))}catch(e){const ta=document.createElement("textarea");ta.value=txt;document.body.append(ta);ta.select();try{document.execCommand("copy");toast(t("copied"))}catch(_){}ta.remove()}}
@@ -490,15 +507,32 @@ function stack(s){
   if(!s.total)return `<div class="stack empty-bar"></div>`;
   return `<div class="stack">${OPS.filter(k=>s[k]>0).map(k=>`<i class="${OPCLS[k]}" style="flex:${s[k]} 1 0" title="${esc(t(k))}: ${num(s[k])} (${pct(s[k],s.total)}%)"></i>`).join("")}</div>`;
 }
+function progBar(s){return `<div class="stack${s.total?"":" empty-bar"}">${s.total?`<i class="my" style="flex:${s.total-s.unknown} 1 0"></i><i class="unk" style="flex:${s.unknown} 1 0"></i>`:""}</div>`}
+function progRows(items){return `<ul class="wards">${items.map(it=>`<li><div class="wardrow" style="cursor:default"><span class="wname">${esc(it.label)}</span><span class="wtot">${num(it.s.total-it.s.unknown)} / ${num(it.s.total)}</span>${progBar(it.s)}<span class="wpct"><span><b>${esc(t("surveyed"))} ${coverage(it.s)}%</b></span><span>${esc(t("remaining"))} ${num(it.s.unknown)}</span></span></div></li>`).join("")}</ul>`}
+function vWorkerDash(){
+  const s=sumFor(S.me.ward_id);const latest=S.notices[0];
+  let out=noBoothsNote();
+  if(latest)out+=`<button class="notice-banner" type="button" data-openfold="notices"><b>📢</b><span>${esc(latest.body)}</span></button>`;
+  out+=`<div class="section-head"><div><h2>${esc(t("progress"))}</h2><p class="sub">${esc(t("myBooths"))}: ${esc(S.booths.map(b=>b.part_no).join(", ")||"—")}</p></div></div>
+  <div class="tiles" style="grid-template-columns:repeat(3,1fr)">
+   <div class="tile"><span>${esc(t("myVoters"))}</span><b>${num(s.total)}</b></div>
+   <div class="tile"><span><i class="dot my"></i>${esc(t("surveyed"))}</span><b>${num(s.total-s.unknown)}</b><small>${coverage(s)}%</small></div>
+   <div class="tile"><span><i class="dot unk"></i>${esc(t("remaining"))}</span><b>${num(s.unknown)}</b></div>
+  </div>${myTodayBar()}`;
+  if(S.booths.length)out+=`<div class="panel"><h3>${esc(t("myBooths"))}</h3>${progRows(S.booths.map(b=>({label:boothLabel(b),s:sumRows(S.boothSum.filter(r=>r.booth_id===b.id))})))}</div>`;
+  out+=`<div class="folds">${fold("notices",t("notices"),noticesInner(),S.notices.length||null)}</div>`;
+  return out;
+}
 function opRows(items,attr){
   return `<ul class="wards">${items.map(it=>`<li><button class="wardrow" type="button" ${attr?`data-${attr}="${esc(it.id)}"`:"disabled"}><span class="wname">${esc(it.label)}</span><span class="wtot">${num(it.s.total)}${it.roll?` / ${num(it.roll)}`:""} ${esc(t("votersN"))}</span>${stack(it.s)}<span class="wpct"><span><b>${esc(t("covered"))} ${coverage(it.s)}%</b></span>${["my_side","neutral","opposite"].map(k=>`<span title="${esc(t(k))}"><i class="dot ${OPCLS[k]}"></i>${pct(it.s[k],it.s.total)}%</span>`).join("")}</span></button></li>`).join("")}</ul>`;
 }
 function vDashboard(){
+  if(isWorker())return vWorkerDash();
   const W=S.dashWard,B=S.dashBooth;
   const w=W?wardById(W):null,bo=B?boothById(B):null;
   const s=B?sumRows(S.boothSum.filter(r=>r.booth_id===B)):sumFor(W);
   const all=sumFor(null);const latest=S.notices[0];
-  let out=wardSwitch();
+  let out=wardSwitch()+noBoothsNote();
   if(isMla()&&backupDue())out+=`<div class="note warn">${esc(t("backupDue"))}</div>`;
   if(latest&&!B)out+=`<button class="notice-banner" type="button" data-openfold="notices"><b>📢</b><span>${esc(latest.body)}</span></button>`;
   out+=`<div class="section-head"><div>${B?`<button class="btn sm ghost" type="button" id="dash-back" style="padding-left:0">← ${esc(t("backWard"))}</button>`:""}<h2>${esc(bo?boothLabel(bo):(w?wardLabel(w):cname()))}</h2><p class="sub">${esc(bo?(bo.polling_station||""):(isMla()?`${t("constituency")}: ${num(all.total)} ${t("votersN")} · ${t("covered")} ${coverage(all)}%`:""))}</p></div></div>
@@ -554,7 +588,7 @@ function vAreas(list){
   const shown=f?list.filter(a=>(n!=null&&areaHasHouse(a,n))||(a.lane+" "+a.hn.join(" ")).toLowerCase().includes(f)):list;
   return `<div class="panel tight"><input type="search" id="a-q" value="${esc(S.aq)}" autocomplete="off" placeholder="🔍 ${esc(t("findArea"))}" aria-label="${esc(t("findArea"))}"></div>
   <p class="sub" style="margin:0 0 -8px">${num(shown.length)} ${esc(t("areasN"))} · ${esc(t("tapArea"))}</p>
-  <div class="panel tight">${shown.length?`<ul class="wards">${shown.map(a=>`<li><button class="wardrow" type="button" data-area="${esc(a.key)}"><span class="wname">${esc(a.lane)}</span><span class="wtot">${num(a.s.total)} ${esc(t("votersN"))}</span><span class="area-hn">${esc(areaMeta(a))}</span>${stack(a.s)}<span class="wpct"><span><b>${esc(t("covered"))} ${coverage(a.s)}%</b></span>${["my_side","neutral","opposite"].map(k=>`<span title="${esc(t(k))}"><i class="dot ${OPCLS[k]}"></i>${pct(a.s[k],a.s.total)}%</span>`).join("")}</span></button></li>`).join("")}</ul>`:`<p class="sub" style="margin:0">${esc(t("noVoters"))}</p>`}</div>`;
+  <div class="panel tight">${shown.length?`<ul class="wards">${shown.map(a=>`<li><button class="wardrow" type="button" data-area="${esc(a.key)}"><span class="wname">${esc(a.lane)}</span><span class="wtot">${num(a.s.total)} ${esc(t("votersN"))}</span><span class="area-hn">${esc(areaMeta(a))}</span>${isWorker()?progBar(a.s):stack(a.s)}<span class="wpct"><span><b>${esc(t("covered"))} ${coverage(a.s)}%</b></span>${isWorker()?`<span>${esc(t("remaining"))} ${num(a.s.unknown)}</span>`:["my_side","neutral","opposite"].map(k=>`<span title="${esc(t(k))}"><i class="dot ${OPCLS[k]}"></i>${pct(a.s[k],a.s.total)}%</span>`).join("")}</span></button></li>`).join("")}</ul>`:`<p class="sub" style="margin:0">${esc(t("noVoters"))}</p>`}</div>`;
 }
 let asReq=0;
 async function loadAreaSum(){
@@ -574,7 +608,7 @@ function vVoters(){
   const W=isMla()?S.cw:S.me.ward_id;
   const areas=areasFor(W);
   const A=S.area?areas.find(a=>a.key===S.area.key):null;if(S.area&&!A)S.area=null;
-  if(S.vmode==="areas"&&!A&&areas.length)return wardSwitch()+modeSeg()+vAreas(areas);
+  if(S.vmode==="areas"&&!A&&areas.length)return wardSwitch()+noBoothsNote()+modeSeg()+vAreas(areas);
   const bo=S.vBooth?boothById(S.vBooth):null;
   const s=A?A.s:bo?sumRows(S.boothSum.filter(r=>r.booth_id===bo.id)):sumFor(W);
   const counts={my_side:s.my_side,neutral:s.neutral,opposite:s.opposite,unknown:s.unknown};
@@ -598,7 +632,7 @@ function vVoters(){
   const filtered=S.q||S.op||S.vSec;
   const bopts=boothsIn(W);
   const head=A?`<div><button class="btn sm ghost" type="button" id="a-back" style="padding-left:0">← ${esc(t("allAreas"))}</button><h2>${esc(A.lane)}</h2><p class="sub" style="overflow-wrap:anywhere">${esc(areaMeta(A))}</p>${[...new Set(A.parts.map(p=>p[0]))].map(id=>`<p class="v-ps" style="font-size:.84rem">🏫 ${esc(psText(boothById(id)))}</p>`).join("")}</div>`:(areas.length?modeSeg():"");
-  return `${wardSwitch()}${head}
+  return `${wardSwitch()}${noBoothsNote()}${head}
   <div class="panel tight">
    <input type="search" id="v-q" value="${esc(S.q)}" autocomplete="off" placeholder="🔍 ${esc(t("search"))}" aria-label="${esc(t("search"))}">
    ${A?"":`<div class="row">
@@ -606,7 +640,7 @@ function vVoters(){
     ${bo&&(bo.sections||[]).length?`<select id="v-sec" aria-label="${esc(t("lane"))}"><option value="">${esc(t("allLanes"))}</option>${bo.sections.map(x=>`<option value="${x.no}" ${String(x.no)===String(S.vSec)?"selected":""}>${x.no}. ${esc(secName(bo,x.no))}</option>`).join("")}</select>`:""}
     <select id="v-sort" aria-label="${esc(t("sort"))}" style="flex:0 1 150px">${[["roll","sortRoll"],["name","sortName"],["house","sortHouse"],["recent","sortRecent"]].map(([k,l])=>`<option value="${k}" ${S.sort===k?"selected":""}>${esc(t(l))}</option>`).join("")}</select>
    </div>`}
-   <div class="chips">${OPS.map(o=>`<button type="button" class="chip" data-vfilter="${o}" aria-pressed="${S.op===o}"><i class="dot ${OPCLS[o]}"></i> ${esc(t(o))}<span class="n">${num(counts[o])}</span></button>`).join("")}</div>
+   <div class="chips">${isWorker()?[["unknown","remaining","unk",counts.unknown],["done","surveyed","my",s.total-s.unknown]].map(([o,l,c,n])=>`<button type="button" class="chip" data-vfilter="${o}" aria-pressed="${S.op===o}"><i class="dot ${c}"></i> ${esc(t(l))}<span class="n">${num(n)}</span></button>`).join(""):OPS.map(o=>`<button type="button" class="chip" data-vfilter="${o}" aria-pressed="${S.op===o}"><i class="dot ${OPCLS[o]}"></i> ${esc(t(o))}<span class="n">${num(counts[o])}</span></button>`).join("")}</div>
   </div>
   <div class="listhead"><span class="sub">${num(S.vCount)} ${esc(t("votersN"))}${A&&nHouses?` · ${num(nHouses)} ${esc(t("houses"))} · ${num(nDone)} ${esc(t("housesDone"))}`:""}${S.voters.length<S.vCount?" · "+num(S.voters.length)+" "+esc(t("shown")):""}</span><button class="btn primary sm" type="button" id="v-add">+ ${esc(t("addVoter"))}</button></div>
   <div class="panel tight">${S.vLoading&&!S.voters.length?`<div class="empty"><div class="spin"></div></div>`:S.voters.length?`<ul class="vlist">${parts.join("")}</ul>${S.voters.length<S.vCount?`<button class="btn" type="button" id="v-more" ${S.vLoading?"disabled":""}>${esc(t("showMore"))}</button>`:""}`:
@@ -619,7 +653,7 @@ function voterQuery(sel,opts){
   if(A){if(W)q=q.eq("ward_id",W);q=q.or(A.parts.map(([b,n])=>`and(booth_id.eq.${b},section_no.eq.${Number(n)})`).join(","))}
   else if(S.vBooth)q=q.eq("booth_id",S.vBooth);else if(W)q=q.eq("ward_id",W);
   if(!A&&S.vBooth&&S.vSec)q=q.eq("section_no",Number(S.vSec));
-  if(S.op)q=q.eq("opinion",S.op);
+  if(S.op==="done")q=q.neq("opinion","unknown");else if(S.op)q=q.eq("opinion",S.op);
   const term=S.q.trim().replace(/[,()%*\\"':]/g," ").replace(/\s+/g," ").trim();
   if(term){const p=`%${term}%`;
     if(/^\d{1,4}$/.test(term))q=q.or(`serial_no.eq.${term},house_no.ilike.${term},house_no.ilike.${term}/%`);
@@ -697,7 +731,7 @@ function openVoter(v){
   const vb=v.booth_id?boothById(v.booth_id):null;
   const myBooths=boothsIn(isMla()?null:S.me.ward_id);
   const boothSel=fromRoll?`<div class="note" style="margin:0"><b>${esc(boothLabel(vb))}</b> · ${esc(t("serial"))} ${v.serial_no}${v.section_no?" · "+esc(secName(vb,v.section_no)):""}${v.relative_name?`<br>${esc(relLine(v))}`:""}</div>`
-    :(myBooths.length?`<div class="row"><label class="f">${esc(t("booth"))}<select id="vf-booth"><option value="">${esc(t("noBooth"))}</option>${myBooths.map(x=>`<option value="${esc(x.id)}" ${x.id===v.booth_id?"selected":""}>${esc(boothLabel(x))}</option>`).join("")}</select></label>
+    :(myBooths.length?`<div class="row"><label class="f">${esc(t("booth"))}${isMla()?"":" *"}<select id="vf-booth">${isMla()?`<option value="">${esc(t("noBooth"))}</option>`:""}${myBooths.map(x=>`<option value="${esc(x.id)}" ${x.id===v.booth_id?"selected":""}>${esc(boothLabel(x))}</option>`).join("")}</select></label>
       ${vb&&(vb.sections||[]).length?`<label class="f">${esc(t("lane"))}<select id="vf-sec"><option value="">—</option>${vb.sections.map(x=>`<option value="${x.no}" ${x.no===v.section_no?"selected":""}>${x.no}. ${esc(secName(vb,x.no))}</option>`).join("")}</select></label>`:""}</div>`:"");
   const wardSel=fromRoll?"":isMla()?`<label class="f">${esc(t("ward"))}<select id="vf-ward">${sortedWards().map(w=>`<option value="${esc(w.id)}" ${w.id===v.ward_id?"selected":""}>${esc(wardLabel(w))}</option>`).join("")}</select></label>`:"";
   const by=!isNew&&v.updated_by?memberById(v.updated_by):null;
@@ -735,6 +769,7 @@ async function saveVoter(id){
    epic_no:$("vf-epic").value.trim().toUpperCase()||null,phone:$("vf-phone").value.trim()||null,consent:$("vf-consent").checked,notes:$("vf-notes").value.trim()||null};
   body.ward_id=isMla()&&$("vf-ward")?$("vf-ward").value:(S.voters.find(x=>x.id===id)?.ward_id||S.me.ward_id);
   if($("vf-booth")){body.booth_id=$("vf-booth").value||null;const sv=$("vf-sec")?.value;body.section_no=body.booth_id&&sv?Number(sv):null}
+  if(!isMla()&&!id&&!body.booth_id){$("vf-err").innerHTML=`<div class="note bad">${esc(t("E_BOOTH_REQUIRED"))}</div>`;return}
   $("vf-save").disabled=true;
   const res=id?await S.sb.from("voters").update(body).eq("id",id).select().single():await S.sb.from("voters").insert(body).select().single();
   if(res.error){$("vf-save").disabled=false;$("vf-err").innerHTML=`<div class="note bad">${esc(errText(res.error))}</div>`;return}
@@ -808,22 +843,42 @@ async function exportCsv(){
 /* ================= team ================= */
 function memberRow(m){
   const act=S.activity.find(a=>a.user_id===m.user_id);
-  const actions=canManage(m)?`<div class="acts"><button class="btn sm ghost" type="button" data-medit="${esc(m.user_id)}">${esc(t("editMember"))}</button><button class="btn sm ghost" type="button" data-mpw="${esc(m.user_id)}">${esc(t("resetPw"))}</button>${m.active?`<button class="btn sm danger ${S.armed==="m:"+m.user_id?"armed":""}" type="button" data-mrm="${esc(m.user_id)}">${esc(S.armed==="m:"+m.user_id?t("confirm"):t("remove"))}</button>`:`<button class="btn sm" type="button" data-mrestore="${esc(m.user_id)}">${esc(t("restore"))}</button>`}</div>`:"";
-  return `<li class="member"><div class="grow"><div class="t">${esc(m.full_name)} <span class="role ${m.role}">${esc(t(m.role))}</span></div><div class="m"><span class="code">${esc(m.login_id)}</span>${m.phone?" · "+esc(m.phone):""}${act&&(Number(act.voters_added)||Number(act.voters_updated))?" · "+esc(t("added"))+" "+num(act.voters_added)+", "+esc(t("updated"))+" "+num(act.voters_updated):""}${!m.active&&m.ward_id?" · "+esc(wardLabel(wardById(m.ward_id))):""}</div></div>${actions}</li>`;
+  const bs=m.role==="mla"?[]:boothsOf(m);
+  const actions=canManage(m)?`<div class="acts">${canAssign(m)?`<button class="btn sm" type="button" data-mbooths="${esc(m.user_id)}">🗳 ${esc(t("assignBooths"))}</button>`:""}<button class="btn sm ghost" type="button" data-medit="${esc(m.user_id)}">${esc(t("editMember"))}</button><button class="btn sm ghost" type="button" data-mpw="${esc(m.user_id)}">${esc(t("resetPw"))}</button>${m.active?`<button class="btn sm danger ${S.armed==="m:"+m.user_id?"armed":""}" type="button" data-mrm="${esc(m.user_id)}">${esc(S.armed==="m:"+m.user_id?t("confirm"):t("remove"))}</button>`:`<button class="btn sm" type="button" data-mrestore="${esc(m.user_id)}">${esc(t("restore"))}</button>`}</div>`:"";
+  return `<li class="member"><div class="grow"><div class="t">${esc(m.full_name)} <span class="role ${m.role}">${esc(t(m.role))}</span></div><div class="m"><span class="code">${esc(m.login_id)}</span>${m.phone?" · "+esc(m.phone):""}${act&&(Number(act.voters_added)||Number(act.voters_updated))?" · "+esc(t("added"))+" "+num(act.voters_added)+", "+esc(t("updated"))+" "+num(act.voters_updated):""}${!m.active&&m.ward_id?" · "+esc(wardLabel(wardById(m.ward_id))):""}</div>${m.role!=="mla"&&m.active?`<div class="btags">${bs.length?bs.map(b=>`<span class="btag">${esc(t("booth"))} ${b.part_no}</span>`).join(""):`<span class="sub" style="font-size:.78rem">${esc(t("noBoothsYet"))}</span>`}</div>`:""}</div>${actions}</li>`;
+}
+function boothRowsMla(w){
+  const bs=boothsIn(w.id);if(!bs.length)return "";
+  return `<div><h3 style="font-size:.95rem;margin-bottom:2px">${esc(t("booths"))}</h3><ul class="mlist">${bs.map(b=>{const n=sumRows(S.boothSum.filter(r=>r.booth_id===b.id));const ld=memberById(b.leader_id),wk=memberById(b.worker_id);
+    return `<li class="member"><div class="grow"><div class="t">${esc(boothLabel(b))}</div><div class="m">${esc(t("leaderLbl"))}: <b>${esc(ld?.full_name||"—")}</b> · ${esc(t("workerLbl"))}: ${esc(wk?.full_name||"—")} · ${num(n.total)} ${esc(t("votersN"))}</div></div>${S.wards.length>1?`<label class="f" style="flex:0 1 190px">${esc(t("moveTo"))}<select data-bmove="${esc(b.id)}">${sortedWards().map(x=>`<option value="${esc(x.id)}" ${x.id===b.ward_id?"selected":""}>${esc(wardLabel(x))}</option>`).join("")}</select></label>`:""}</li>`}).join("")}</ul></div>`;
 }
 function wardBlock(w,open){
   const ms=S.members.filter(m=>m.ward_id===w.id&&m.active);
   const leaders=ms.filter(m=>m.role==="ward_leader"),workers=ms.filter(m=>m.role==="worker");
   const s=sumFor(w.id);
-  const canAddWorker=isMla()||(isLeader()&&S.me.ward_id===w.id);
   const isOpen=S.openWards&&w.id in S.openWards?S.openWards[w.id]:open;
-  return `<details class="ward" data-ward="${esc(w.id)}" ${isOpen?"open":""}><summary><span style="flex:1;min-width:0"><b class="wname" style="font-family:var(--display);font-size:1.05rem">${esc(wardLabel(w))}</b><br><span class="sub" style="font-size:.8rem">${num(leaders.length)} ${esc(t("leaders"))} · ${num(workers.length)} ${esc(t("workers"))} · ${num(s.total)} ${esc(t("votersN"))} · ${esc(t("my_side"))} ${pct(s.my_side,s.total)}%</span></span></summary>
-   <div class="body">
-    <div class="row" style="justify-content:flex-start">${isMla()?`<button class="btn sm fit" type="button" data-addm="ward_leader" data-w="${esc(w.id)}">+ ${esc(t("addLeader"))}</button>`:""}${canAddWorker?`<button class="btn sm fit" type="button" data-addm="worker" data-w="${esc(w.id)}">+ ${esc(t("addWorker"))}</button>`:""}${isMla()?`<button class="btn sm ghost fit" type="button" data-wedit="${esc(w.id)}">${esc(t("editWard"))}</button><button class="btn sm ghost danger fit ${S.armed==="w:"+w.id?"armed":""}" type="button" data-wdel="${esc(w.id)}">${esc(S.armed==="w:"+w.id?t("confirm"):t("delWard"))}</button>`:""}</div>
-    <div><h3 style="font-size:.95rem;margin-bottom:2px">${esc(t("leaders"))}</h3>${leaders.length?`<ul class="mlist">${leaders.map(memberRow).join("")}</ul>`:`<p class="sub" style="margin:0">${esc(t("noLeader"))}</p>`}</div>
-    <div><h3 style="font-size:.95rem;margin-bottom:2px">${esc(t("workers"))}</h3>${workers.length?`<ul class="mlist">${workers.map(memberRow).join("")}</ul>`:`<p class="sub" style="margin:0">${esc(t("noWorkers"))}</p>`}</div>
-    ${boothsIn(w.id).length?`<div><h3 style="font-size:.95rem;margin-bottom:2px">${esc(t("booths"))}</h3><ul class="mlist">${boothsIn(w.id).map(b=>{const bs=sumRows(S.boothSum.filter(r=>r.booth_id===b.id));return `<li class="member"><div class="grow"><div class="t">${esc(boothLabel(b))}</div><div class="m">${esc(b.polling_station||"")} · ${num(bs.total)} ${esc(t("votersN"))}</div></div>${isMla()&&S.wards.length>1?`<label class="f" style="flex:0 1 190px">${esc(t("moveTo"))}<select data-bmove="${esc(b.id)}">${sortedWards().map(x=>`<option value="${esc(x.id)}" ${x.id===b.ward_id?"selected":""}>${esc(wardLabel(x))}</option>`).join("")}</select></label>`:""}</li>`}).join("")}</ul></div>`:""}
-   </div></details>`;
+  const sumLine=isWorker()?`${num(s.total)} ${t("votersN")}`:`${num(leaders.length)} ${t("leaders")} · ${num(workers.length)} ${t("workers")} · ${num(s.total)} ${t("votersN")} · ${t("my_side")} ${pct(s.my_side,s.total)}%`;
+  let body="";
+  if(isMla()){
+    const free=boothsIn(w.id).filter(b=>!b.leader_id);
+    body+=`<div class="row" style="justify-content:flex-start"><button class="btn sm fit" type="button" data-addm="ward_leader" data-w="${esc(w.id)}">+ ${esc(t("addLeader"))}</button><button class="btn sm ghost fit" type="button" data-wedit="${esc(w.id)}">${esc(t("editWard"))}</button><button class="btn sm ghost danger fit ${S.armed==="w:"+w.id?"armed":""}" type="button" data-wdel="${esc(w.id)}">${esc(S.armed==="w:"+w.id?t("confirm"):t("delWard"))}</button></div>`;
+    if(free.length)body+=`<div class="note warn" style="margin:0">${esc(t("freeBooths"))}: <b>${esc(free.map(b=>b.part_no).join(", "))}</b></div>`;
+    body+=`<div><h3 style="font-size:.95rem;margin-bottom:2px">${esc(t("leaders"))}</h3>${leaders.length?`<ul class="mlist">${leaders.map(l=>{const ws=workers.filter(x=>x.leader_id===l.user_id);return memberRow(l)+(ws.length?`<li class="sub-members"><ul class="mlist">${ws.map(memberRow).join("")}</ul></li>`:"")}).join("")}</ul>`:`<p class="sub" style="margin:0">${esc(t("noLeader"))}</p>`}</div>`;
+    const orphans=workers.filter(x=>!leaders.some(l=>l.user_id===x.leader_id));
+    if(orphans.length)body+=`<div><h3 style="font-size:.95rem;margin-bottom:2px">${esc(t("workers"))}</h3><ul class="mlist">${orphans.map(memberRow).join("")}</ul></div>`;
+    body+=boothRowsMla(w);
+  }else if(isLeader()){
+    const mine=S.booths.filter(b=>b.leader_id===S.me.user_id);const free=mine.filter(b=>!b.worker_id);
+    body+=`<div class="row" style="justify-content:flex-start"><button class="btn sm fit" type="button" data-addm="worker" data-w="${esc(w.id)}">+ ${esc(t("addWorker"))}</button></div>`;
+    body+=`<div><h3 style="font-size:.95rem;margin-bottom:2px">${esc(t("myBooths"))}</h3>${mine.length?`<ul class="mlist">${mine.map(b=>{const wk=memberById(b.worker_id);const n=sumRows(S.boothSum.filter(r=>r.booth_id===b.id));return `<li class="member"><div class="grow"><div class="t">${esc(boothLabel(b))}</div><div class="m">${esc(t("workerLbl"))}: <b>${esc(wk?.full_name||t("noWorkerYet"))}</b> · ${num(n.total)} ${esc(t("votersN"))} · ${esc(t("covered"))} ${coverage(n)}%</div></div></li>`}).join("")}</ul>`:`<p class="sub" style="margin:0">${esc(t("noBoothsLeader"))}</p>`}</div>`;
+    if(free.length&&workers.length)body+=`<div class="note warn" style="margin:0">${esc(t("freeWorkerBooths"))}: <b>${esc(free.map(b=>b.part_no).join(", "))}</b></div>`;
+    body+=`<div><h3 style="font-size:.95rem;margin-bottom:2px">${esc(t("workers"))}</h3>${workers.length?`<ul class="mlist">${workers.map(memberRow).join("")}</ul>`:`<p class="sub" style="margin:0">${esc(t("noWorkers"))}</p>`}</div>`;
+  }else{
+    const ld=memberById(S.me.leader_id);
+    body+=`<div><h3 style="font-size:.95rem;margin-bottom:2px">${esc(t("myBooths"))}</h3>${S.booths.length?`<ul class="mlist">${S.booths.map(b=>`<li class="member"><div class="grow"><div class="t">${esc(boothLabel(b))}</div><div class="m">🏫 ${esc(b.polling_station||"")}</div></div></li>`).join("")}</ul>`:`<p class="sub" style="margin:0">${esc(t("noBoothsWorker"))}</p>`}</div>`;
+    if(ld)body+=`<div><h3 style="font-size:.95rem;margin-bottom:2px">${esc(t("myLeader"))}</h3><ul class="mlist"><li class="member"><div class="grow"><div class="t">${esc(ld.full_name)}</div><div class="m">${esc(ld.phone||"")}</div></div>${ld.phone?`<button class="btn sm" type="button" data-call="${esc(ld.phone)}">📞 ${esc(t("call"))}</button>`:""}</li></ul></div>`;
+  }
+  return `<details class="ward" data-ward="${esc(w.id)}" ${isOpen?"open":""}><summary><span style="flex:1;min-width:0"><b class="wname" style="font-family:var(--display);font-size:1.05rem">${esc(wardLabel(w))}</b><br><span class="sub" style="font-size:.8rem">${esc(sumLine)}</span></span></summary><div class="body">${body}</div></details>`;
 }
 function vTeam(){
   let out=`<div class="section-head"><div><h2>${esc(t("team"))}</h2><p class="sub">${esc(isMla()?t("wards")+": "+num(S.wards.length):wardLabel(wardById(S.me.ward_id)))}</p></div>${isMla()?`<button class="btn primary fit" type="button" id="w-add">+ ${esc(t("addWard"))}</button>`:""}</div>`;
@@ -832,7 +887,7 @@ function vTeam(){
   const removed=S.members.filter(m=>!m.active&&canManage(m));
   if(removed.length)out+=`<details class="ward" data-removed ${S.openRemoved?"open":""}><summary><span style="flex:1"><b style="font-family:var(--display)">${esc(t("removed"))}</b> <span class="code">${num(removed.length)}</span></span></summary><div class="body"><ul class="mlist">${removed.map(memberRow).join("")}</ul></div></details>`;
   let tools="";
-  if(canManageVoters())tools+=`<div class="panel"><div><h3>CSV</h3><p class="sub">${esc(t("importHelp"))}</p></div><div class="row"><button class="btn fit" type="button" id="v-import">${esc(t("importCsv"))}</button><button class="btn fit" type="button" id="v-export">${esc(t("exportCsv"))}</button></div></div>`;
+  if(canManageVoters())tools+=`<div class="panel"><div><h3>CSV</h3>${isMla()?`<p class="sub">${esc(t("importHelp"))}</p>`:""}</div><div class="row">${isMla()?`<button class="btn fit" type="button" id="v-import">${esc(t("importCsv"))}</button>`:""}<button class="btn fit" type="button" id="v-export">${esc(t("exportCsv"))}</button></div></div>`;
   if(isMla()){
     tools+=`<div class="panel"><div><h3>${esc(t("target"))}</h3></div><div class="row"><label class="f" style="flex:0 1 160px">${esc(t("target"))}<input type="number" id="tg-val" min="1" max="1000" value="${target()}"></label><button class="btn fit" type="button" id="tg-save">${esc(t("saveTarget"))}</button></div></div>`;
     tools+=`<div class="panel"><div><h3>${esc(t("backup"))}</h3><p class="sub">${esc(t("backupHelp"))}</p><p class="sub">${esc(t("lastBackup"))}: <b>${S.settings.last_backup?esc(fmtTime(S.settings.last_backup)):esc(t("never"))}</b></p></div><div class="row"><span style="flex:1 1 0"></span><button class="btn primary fit" type="button" id="bk-dl">${esc(t("downloadBackup"))}</button></div></div>`;
@@ -915,6 +970,24 @@ async function saveWard(id){
   if(isMla()&&!wardById(S.cw)){S.cw=S.vWard=S.dashWard=res.data.id;store("cd.ward",res.data.id)}
   closeSheet();toast(t("saved"));render();
 }
+function boothPicker(member,role,wardId){
+  const mid=member?.user_id;
+  const cands=role==="ward_leader"?boothsIn(wardId):S.booths.filter(b=>b.leader_id===S.me.user_id);
+  if(!cands.length)return `<p class="sub" style="margin:0">${esc(t(role==="ward_leader"?"noBoothsYet":"noBoothsLeader"))}</p>`;
+  return `<div class="blist" id="bpick">${cands.map(b=>{const owner=role==="ward_leader"?b.leader_id:b.worker_id;const taken=owner&&owner!==mid;const who=taken?(memberById(owner)?.full_name||"—"):"";
+    return `<label class="bchk${taken?" taken":""}"><input type="checkbox" value="${esc(b.id)}" ${owner&&owner===mid?"checked":""} ${taken?"disabled":""}><span><b>${esc(t("booth"))} ${b.part_no}</b> · ${esc(b.place||"")}<small>${esc(b.polling_station||"")}${taken?` — ${esc(t("takenBy"))} ${esc(who)}`:""}</small></span></label>`}).join("")}</div>`;
+}
+const pickedBooths=()=>[...document.querySelectorAll('#bpick input:checked')].map(x=>x.value);
+function openBooths(m){
+  openSheet(`<div class="sheet-head"><h3>${esc(t("chooseBooths"))}: ${esc(m.full_name)}</h3><button class="btn ghost sm" type="button" data-close>✕</button></div>
+   ${boothPicker(m,m.role,m.ward_id)}<div id="bp-err"></div>
+   <div class="row"><span style="flex:1 1 0"></span><button class="btn primary fit" type="button" id="bp-save" data-id="${esc(m.user_id)}">${esc(t("save"))}</button></div>`);
+}
+async function saveBooths(btn){
+  btn.disabled=true;const {error}=await S.sb.rpc("assign_booths",{p_member:btn.dataset.id,p_booths:pickedBooths()});
+  if(error){btn.disabled=false;$("bp-err").innerHTML=`<div class="note bad">${esc(errText(error))}</div>`;return}
+  await loadAll();closeSheet();render();toast(t("saved"));
+}
 function openMember(role,wardId,m){
   const edit=!!m;
   const wsel=isMla()?`<label class="f">${esc(t("ward"))}<select id="mf-ward">${sortedWards().map(w=>`<option value="${esc(w.id)}" ${w.id===(m?.ward_id||wardId)?"selected":""}>${esc(wardLabel(w))}</option>`).join("")}</select></label>`:"";
@@ -923,7 +996,8 @@ function openMember(role,wardId,m){
    <label class="f">${esc(t("fullName"))} *<input type="text" id="mf-name" value="${esc(m?.full_name||"")}"></label>
    <label class="f">${esc(t("phone"))}<input type="tel" id="mf-phone" value="${esc(m?.phone||"")}" inputmode="tel"></label>
    ${edit?"":`<div class="row"><label class="f">${esc(t("loginId"))} *<input type="text" id="mf-login" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="ravi.w3"></label>
-   <label class="f">${esc(t("password"))} *<div style="display:flex;gap:6px"><input type="text" id="mf-pw" value="${genPw()}" autocomplete="off" spellcheck="false"><button class="btn sm" type="button" id="mf-gen">${esc(t("generate"))}</button></div></label></div>`}
+   <label class="f">${esc(t("password"))} *<div style="display:flex;gap:6px"><input type="text" id="mf-pw" value="${genPw()}" autocomplete="off" spellcheck="false"><button class="btn sm" type="button" id="mf-gen">${esc(t("generate"))}</button></div></label></div>
+   <div class="f"><span style="font-size:.82rem;color:var(--muted);font-weight:500">${esc(t("chooseBooths"))}</span><div id="mf-booths">${boothPicker(null,role,wardId||S.me.ward_id)}</div></div>`}
    <div id="mf-err"></div>
    <div class="row"><span style="flex:1 1 0"></span><button class="btn primary fit" type="button" id="mf-save" data-role="${esc(role||"")}" data-w="${esc(wardId||"")}" data-id="${esc(m?.user_id||"")}">${esc(t("save"))}</button></div>`);
   setTimeout(()=>$("mf-name")?.focus(),50);
@@ -936,14 +1010,12 @@ async function saveMember(btn){
   if(btn.dataset.id){
     const {error}=await S.sb.rpc("update_member",{p_user:btn.dataset.id,p_full_name:name,p_phone:phone,p_ward:ward});
     if(error)return err(error);
-    const m=memberById(btn.dataset.id);Object.assign(m,{full_name:name||m.full_name,phone:phone||null,ward_id:ward});
-    closeSheet();toast(t("saved"));render();return;
+    await loadAll();closeSheet();render();toast(t("saved"));return;
   }
   const login=$("mf-login").value.trim().toLowerCase(),pw=$("mf-pw").value;
-  const {data:uid,error}=await S.sb.rpc("create_member",{p_login:login,p_password:pw,p_full_name:name,p_phone:phone,p_role:btn.dataset.role,p_ward:ward});
+  const {data:uid,error}=await S.sb.rpc("create_member",{p_login:login,p_password:pw,p_full_name:name,p_phone:phone,p_role:btn.dataset.role,p_ward:ward,p_booths:pickedBooths()});
   if(error)return err(error);
-  S.members.push({user_id:uid,login_id:login,full_name:name,phone:phone||null,role:btn.dataset.role,ward_id:ward,active:true});
-  render();showCreds(name,login,pw);
+  await loadAll();render();showCreds(name,login,pw);
 }
 function showCreds(name,login,pw){
   const link=CFG.APP_LINK||(/^https?:/.test(location.protocol)&&!/androidplatform/.test(location.host)?location.origin+location.pathname:"");
@@ -968,7 +1040,7 @@ async function saveResetPw(id){
 async function setActive(id,active){
   const {error}=await S.sb.rpc("set_member_active",{p_user:id,p_active:active});
   if(error){toast(errText(error));return}
-  memberById(id).active=active;toast(t("saved"));render();
+  await loadAll();render();toast(t("saved"));
 }
 
 /* account */
@@ -1071,24 +1143,24 @@ function vPolling(){
   const allT=S.turnout.filter(x=>bs.some(bb=>bb.id===x.booth_id)).reduce((a,x)=>({total:a.total+Number(x.total),voted:a.voted+Number(x.voted)}),{total:0,voted:0});
   const f=S.pFound;
   return `${wardSwitch()}<div class="section-head"><div><h2>${esc(t("polling_tab"))}</h2><p class="sub">${esc(t("pollingHelp"))}</p></div></div>
-  <div class="tiles" style="grid-template-columns:repeat(3,1fr)">
+  <div class="tiles" style="grid-template-columns:repeat(${isWorker()?2:3},1fr)">
    <div class="tile"><span>${esc(t("turnout"))} · ${esc(t("booth"))} ${b.part_no}</span><b>${pct(tu.voted,tu.total)}%</b><small>${num(tu.voted)} / ${num(tu.total)}</small></div>
-   <div class="tile"><span><i class="dot my"></i>${esc(t("my_side"))} ${esc(t("votedN"))}</span><b>${pct(tu.supporters_voted,tu.supporters)}%</b><small>${num(tu.supporters_voted)} / ${num(tu.supporters)}</small></div>
+   ${isWorker()?"":`<div class="tile"><span><i class="dot my"></i>${esc(t("my_side"))} ${esc(t("votedN"))}</span><b>${pct(tu.supporters_voted,tu.supporters)}%</b><small>${num(tu.supporters_voted)} / ${num(tu.supporters)}</small></div>`}
    <div class="tile"><span>${esc(t("turnout"))} · ${esc(wardLabel(wardById(isMla()?S.cw:S.me.ward_id)))}</span><b>${pct(allT.voted,allT.total)}%</b><small>${num(allT.voted)} / ${num(allT.total)}</small></div>
   </div>
   <div class="panel">
    <label class="f">${esc(t("booth"))}<select id="p-booth">${bs.map(x=>`<option value="${esc(x.id)}" ${x.id===b.id?"selected":""}>${esc(boothLabel(x))}</option>`).join("")}</select></label>
    <form class="row" id="p-form" style="align-items:flex-end"><label class="f" style="flex:1 1 140px">${esc(t("serialSearch"))}<input type="number" id="p-serial" inputmode="numeric" min="1" style="font-size:1.4rem;font-weight:600" autocomplete="off"></label><button class="btn primary fit" type="submit" style="padding:12px 22px">${esc(t("find"))}</button></form>
    ${f===false?`<div class="note bad">${esc(t("notFound"))}</div>`:""}
-   ${f?`<div class="note" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:${f.voted?"var(--ok-soft)":"var(--sunk)"}"><div style="flex:1 1 180px;min-width:0"><b style="font-size:1.1rem">${esc(t("serial"))} ${f.serial_no} · ${esc(f.full_name)}</b><br><span class="sub">${esc(relLine(f))} · ${esc(t("houseN"))} ${esc(f.house_no||"–")} · ${esc(f.epic_no||"")} · <b>${esc(t(f.opinion))}</b></span></div>
+   ${f?`<div class="note" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:${f.voted?"var(--ok-soft)":"var(--sunk)"}"><div style="flex:1 1 180px;min-width:0"><b style="font-size:1.1rem">${esc(t("serial"))} ${f.serial_no} · ${esc(f.full_name)}</b><br><span class="sub">${esc(relLine(f))} · ${esc(t("houseN"))} ${esc(f.house_no||"–")} · ${esc(f.epic_no||"")} ${isWorker()?"":`· <b>${esc(t(f.opinion))}</b>`}</span></div>
      ${f.voted?`<span class="role" style="background:var(--ok);color:var(--surface)">✓ ${esc(t("hasVoted"))}</span><button class="btn sm" type="button" data-pvote="${esc(f.id)}" data-v="0">${esc(t("undoVoted"))}</button>`:`<button class="btn primary fit" type="button" data-pvote="${esc(f.id)}" data-v="1" style="padding:12px 18px">✓ ${esc(t("markVoted"))}</button>`}</div>`:""}
   </div>
-  <div class="panel"><h3>${esc(t("supNotVoted"))} <span class="code">${num(Math.max(0,tu.supporters-tu.supporters_voted))}</span></h3>
+  ${isWorker()?"":`<div class="panel"><h3>${esc(t("supNotVoted"))} <span class="code">${num(Math.max(0,tu.supporters-tu.supporters_voted))}</span></h3>
    ${S.pSup.length?`<ul class="vlist">${S.pSup.map(v=>`<li class="voter"><div class="v-main"><span class="v-name">${esc(t("serial"))} ${v.serial_no} · ${esc(v.full_name)}</span><span class="v-meta">${esc(t("houseN"))} ${esc(v.house_no||"–")} · ${esc(relLine(v))}</span></div>${v.phone?`<button class="btn sm" type="button" data-call="${esc(v.phone)}">📞 ${esc(t("call"))}</button>`:""}<button class="btn sm primary" type="button" data-pvote="${esc(v.id)}" data-v="1">✓ ${esc(t("markVoted"))}</button></li>`).join("")}</ul>`:`<p class="sub" style="margin:0">${esc(tu.supporters?t("allVotedSup"):"—")}</p>`}
-  </div>`;
+  </div>`}`;
 }
 async function loadPolling(){
-  if(!S.pBooth)return;
+  if(!S.pBooth||isWorker())return;
   const {data,error}=await S.sb.from("voters").select("id,serial_no,full_name,house_no,relation,relative_name,phone,opinion,voted,ward_id,booth_id").eq("booth_id",S.pBooth).eq("opinion","my_side").eq("voted",false).order("serial_no").limit(200);
   if(!error){S.pSup=data;applyQueue(S.pSup);S.pSup=S.pSup.filter(v=>!v.voted)}
   if(S.tab==="polling")render();
@@ -1196,6 +1268,8 @@ document.addEventListener("click",async ev=>{
   if(b.id==="wf-save"){saveWard(d.id);return}
   if(d.wdel){if(S.armed!=="w:"+d.wdel){S.armed="w:"+d.wdel;render();return}S.armed=null;const {error}=await S.sb.from("wards").delete().eq("id",d.wdel);if(error){toast(errText(error));render();return}S.wards=S.wards.filter(w=>w.id!==d.wdel);if(S.cw===d.wdel){S.cw="";const f=sortedWards()[0];if(f){S.cw=S.vWard=S.dashWard=f.id;store("cd.ward",f.id)}else{S.vWard="";S.dashWard=null}}render();return}
   if(d.addm){openMember(d.addm,d.w,null);return}
+  if(d.mbooths){openBooths(memberById(d.mbooths));return}
+  if(b.id==="bp-save"){saveBooths(b);return}
   if(d.medit){const m=memberById(d.medit);openMember(m.role,m.ward_id,m);return}
   if(b.id==="mf-gen"){$("mf-pw").value=genPw();return}
   if(b.id==="mf-save"){saveMember(b);return}
@@ -1222,6 +1296,7 @@ document.addEventListener("change",ev=>{
   else if(el.id==="v-booth"){S.vBooth=el.value;S.vSec="";loadVoters(true)}
   else if(el.id==="v-sec"){S.vSec=el.value;loadVoters(true)}
   else if(el.dataset.bmove){moveBooth(el.dataset.bmove,el.value)}
+  else if(el.id==="mf-ward"&&$("mf-booths")){$("mf-booths").innerHTML=boothPicker(null,$("mf-save").dataset.role,el.value)}
   else if(el.id==="v-sort"){S.sort=el.value;loadVoters(true)}
   else if(el.id==="im-file"&&el.files[0])readImport(el.files[0]);
   else if(el.id==="roll-file"&&el.files[0])readRoll(el.files[0]);
